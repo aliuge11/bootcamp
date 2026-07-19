@@ -77,17 +77,20 @@ export default function UploadHistoryList({
               checked={selected.includes(upload.id)}
               onChange={() => toggle(upload.id)}
               aria-label={`${upload.original_filename} karşılaştırmaya ekle`}
+              className="h-4 w-4 shrink-0 accent-primary"
             />
-            <Link href={`/map/${upload.id}`} className="text-body-md flex-1 text-ink">
+            <Link href={`/map/${upload.id}`} className="text-body-md min-w-0 flex-1 truncate text-ink">
               {upload.original_filename}
             </Link>
-            <span className="text-body-sm text-muted">{formatDate(upload.uploaded_at)}</span>
-            <span className="text-body-sm text-muted">{upload.matched_rows} satır</span>
+            <span className="text-body-sm shrink-0 text-muted">{formatDate(upload.uploaded_at)}</span>
+            <span className="text-metric-md w-16 shrink-0 text-right text-muted">
+              {upload.matched_rows} satır
+            </span>
             <button
               type="button"
               onClick={() => handleDelete(upload.id, upload.original_filename)}
               disabled={deletingId === upload.id}
-              className="text-body-sm text-muted disabled:text-muted-soft"
+              className="text-body-sm w-8 shrink-0 text-right text-muted-soft hover:text-muted disabled:text-muted-soft"
               aria-label={`${upload.original_filename} sil`}
             >
               Sil
