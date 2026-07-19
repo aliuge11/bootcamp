@@ -10,23 +10,21 @@ export interface CompareMap {
   regionStats: RegionStat[];
 }
 
-// 4 harita yan yana (1x4) çok dar kalıyor; 2x2'ye bölünce her harita daha
-// geniş render oluyor (yükseklikten kazanılandan fazlasını genişlikten
-// kazanıyor, çünkü harita en-boy oranı zaten yatay).
+// 3-4 harita tek sırada (1x3/1x4) çok dar kalıyor; 2 sütuna bölününce her
+// harita daha geniş render oluyor (harita en-boy oranı zaten yatay, dar bir
+// sütundan çok dar bir satıra razı olmak daha pahalıya patlıyor). 3 harita
+// 2 üstte + 1 altta, 4 harita 2x2 — CSS grid'in doğal auto-flow'u kullanılıyor,
+// satır sayısı elle hesaplanmıyor.
 function gridColumns(count: number): number {
-  return count === 4 ? 2 : count;
+  return count <= 2 ? count : 2;
 }
 
 function borderClass(index: number, count: number): string | undefined {
   const columns = gridColumns(count);
-  if (columns === count) {
-    // Tek satır: sonuncu hariç hepsinde sağ kenarlık.
-    return index < count - 1 ? "border-r border-hairline" : undefined;
-  }
-  // 2x2: sağ sütun hariç sağ kenarlık, alt satır hariç alt kenarlık.
   const classes: string[] = [];
-  if (index % columns !== columns - 1) classes.push("border-r");
-  if (index < count - columns) classes.push("border-b");
+  const isLastInRow = (index + 1) % columns === 0;
+  if (!isLastInRow && index + 1 < count) classes.push("border-r");
+  if (index + columns < count) classes.push("border-b");
   return classes.length > 0 ? `${classes.join(" ")} border-hairline` : undefined;
 }
 
