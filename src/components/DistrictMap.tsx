@@ -23,9 +23,10 @@ interface DistrictMapProps {
   ilSlug: string;
   /** ilçe adı (title-case) -> o ilçenin toplam kargo/SLA dışı sayısı. */
   ilceStats?: Map<string, IlceStat>;
+  onIlceClick?: (ilce: string) => void;
 }
 
-export default function DistrictMap({ ilSlug, ilceStats }: DistrictMapProps) {
+export default function DistrictMap({ ilSlug, ilceStats, onIlceClick }: DistrictMapProps) {
   const [features, setFeatures] = useState<IlceFeature[] | null>(null);
 
   useEffect(() => {
@@ -73,7 +74,11 @@ export default function DistrictMap({ ilSlug, ilceStats }: DistrictMapProps) {
         const fill = SLA_BUCKET_COLORS[bucket];
 
         return (
-          <g key={f.properties.name}>
+          <g
+            key={f.properties.name}
+            onClick={onIlceClick ? () => onIlceClick(label) : undefined}
+            className={onIlceClick ? "cursor-pointer" : undefined}
+          >
             <path
               d={d}
               fill={fill}
