@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
 import { parseKargoWorkbook } from "@/lib/xlsxImport";
 import { generateUploadId } from "@/lib/slug";
-import { withTransaction } from "@/lib/db";
+import { query, withTransaction } from "@/lib/db";
+import type { UploadRecord } from "@/types";
+
+export async function GET() {
+  const uploads = await query<UploadRecord>("SELECT * FROM uploads ORDER BY uploaded_at DESC");
+  return NextResponse.json({ uploads });
+}
 
 export async function POST(request: Request) {
   const formData = await request.formData();

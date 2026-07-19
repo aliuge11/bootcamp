@@ -230,7 +230,7 @@ badge-sla, o bölgenin SLA dışı oranı bucket'ına göre 5 renkten birini al�
 Birincil aksiyon button-primary; ikincil aksiyonlar button-ghost. Sayfada aynı anda tek bir button-primary olmalı.
 
 ### Upload dropzone
-Xlsx yükleme alanı sade bir kesikli-kenarlıklı (hairline-strong) dikdörtgen. 4. haritadan sonra devre dışı görünüyor.
+Xlsx yükleme alanı sade bir kesikli-kenarlıklı (hairline-strong) dikdörtgen. Yükleme her zaman açık — yüklemeler kalıcı ve sınırsız (bkz. INTENT.md). 4 harita sınırı yükleme anında değil, geçmiş listesinden karşılaştırma için seçim yaparken uygulanıyor: 5. dosya seçilmeye çalışılırsa "en fazla 4 harita" uyarısı gösteriliyor, seçim engelleniyor.
 
 ### Map legend
 Referans rapordaki lejant kutusunun birebir karşılığı: 5 satır, her satırda küçük bir renk karesi + aralık metni ("%25+", "%24 - %10", "%9 - %0.01", "%0", "Gönderim Yok"). Her haritanın kendi lejantı var (4 harita yan yanaysa 4 lejant).
