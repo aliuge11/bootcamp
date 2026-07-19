@@ -24,3 +24,4 @@ npm run build       # üretim derlemesi
 - [STYLE.md](STYLE.md) — arayüz ve dokümantasyon yazım kuralları.
 - [MEMORY.md](MEMORY.md) — oturumlar arası kararlar ve teknik gerçekler.
 - [PLAN.md](PLAN.md) — sıfırdan MVP'ye 10 adımlık yapım planı (bu kod ondan üretildi).
+"# bootcamp" 
