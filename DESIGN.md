@@ -210,7 +210,7 @@ Tek aile: **Inter**. Yoğun sayısal veriyle çalışan bir kontrol panelinde ik
 - **Harita araç şeridi:** Harita/karşılaştırma sayfalarında, harita bölmesinin hemen üstünde, sayfaya özgü ince bir şerit — iki nav-button (Geri/İleri), bkz. Components > Navigasyon.
 - **Harita bölmesi:** Ekranın ana gövdesi. Tek harita yüklüyse tam genişlik; 2-4 harita yüklüyse eşit genişlikte dikey hairline ile ayrılmış sütunlara bölünüyor.
 - **Harita lejantı:** Her haritanın sağ alt köşesinde sabit, referans rapordaki gibi 5 satırlık küçük bir kutu (map-legend) — renk kutusu + aralık etiketi.
-- **Detay paneli:** Bir şehre tıklandığında haritanın **yanında**, kendi sütununda açılan sabit genişlikli bir panel — harita alanının üzerine **bindirilmiyor**. Panel açıkken harita bölmesi genişliğini panel kadar kaybediyor (flex/grid ile), böylece panel hiçbir ilçeyi/ili görsel olarak kapatmıyor ve tıklanabilirliğini engellemiyor. Bu kural kesin: bir overlay/drawer'ın harita üzerine bindiği herhangi bir uygulama hatalıdır.
+- **Detay paneli:** Bir şehre tıklandığında haritanın **yanında**, kendi sütununda açılan sabit genişlikli bir panel — harita alanının üzerine **bindirilmiyor**. Panel açıkken harita bölmesi genişliğini panel kadar kaybediyor (flex/grid ile), böylece panel hiçbir ilçeyi/ili görsel olarak kapatmıyor ve tıklanabilirliğini engellemiyor. Bu kural kesin: bir overlay/drawer'ın harita üzerine bindiği herhangi bir uygulama hatalıdır. Tek harita görünümünde panel 320px, karşılaştırma görünümünde (2-4 harita, her birinin kendi paneli açılabildiği için yer daha kıymetli) 256px genişliğinde.
 - **Yoğunluk:** Container-padding (24px) ve card-gap (16px) dışında gereksiz negatif alan yok.
 
 ## Elevation & Depth

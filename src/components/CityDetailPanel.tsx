@@ -28,7 +28,7 @@ export default function CityDetailPanel({
   const bucket = getSlaBucket(kargoSayisi, slaDisi);
 
   return (
-    <div className="absolute right-0 top-0 h-full w-80 border-l border-l-hairline-strong bg-surface-card p-panel-padding">
+    <div className="h-full border-l border-l-hairline-strong bg-surface-card p-panel-padding">
       <div className="mb-4 flex items-start justify-between">
         <div>
           <h2 className="text-headline-sm text-ink">{name}</h2>

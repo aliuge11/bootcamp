@@ -63,7 +63,7 @@ export default function TurkeyMap({ ilStats, onIlClick, selectedName }: TurkeyMa
   return (
     <svg
       viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-      className="h-auto w-full"
+      className="h-auto w-full overflow-hidden"
       role="img"
       aria-label="Türkiye il haritası"
     >

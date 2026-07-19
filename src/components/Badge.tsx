@@ -2,11 +2,11 @@ import { SLA_BUCKET_COLORS } from "@/lib/slaColor";
 import type { SlaBucket } from "@/types";
 
 const SOFT_BG: Record<SlaBucket, string> = {
-  critical: "#fbe4e2",
-  high: "#fdf0dc",
-  moderate: "#e4f3fa",
-  clean: "#eef6e4",
-  "no-data": "#c4c4c4",
+  critical: "#3a1e1c",
+  high: "#3a2e18",
+  moderate: "#162a33",
+  clean: "#1e2a16",
+  "no-data": "#2a2a2a",
 };
 
 export default function Badge({ bucket, children }: { bucket: SlaBucket; children: string }) {

@@ -1,10 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import TurkeyMap, { type IlStat } from "./TurkeyMap";
 import DistrictMap, { type IlceStat } from "./DistrictMap";
 import MapLegend from "./MapLegend";
 import CityDetailPanel from "./CityDetailPanel";
+import NavToolbar from "./NavToolbar";
+import { useSelectionHistory } from "@/lib/useSelectionHistory";
 import { normalizeRegionName } from "@/lib/text";
 import type { RegionStat } from "@/types";
 
@@ -16,22 +18,33 @@ export interface SelectedRegion {
 
 interface MapPanelProps {
   regionStats: RegionStat[];
-  /** Verilirse MapPanel kontrollü çalışır (karşılaştırma görünümünde senkron seçim için). */
+  /** Verilirse MapPanel kontrollü çalışır (karşılaştırma görünümünde senkron seçim için); Geri/İleri de üst bileşen tarafından yönetilir. */
   selected?: SelectedRegion | null;
   onSelect?: (region: SelectedRegion | null) => void;
 }
 
 export default function MapPanel({ regionStats, selected: controlledSelected, onSelect }: MapPanelProps) {
-  const [localSelected, setLocalSelected] = useState<SelectedRegion | null>(null);
   const isControlled = controlledSelected !== undefined;
-  const selected = isControlled ? controlledSelected : localSelected;
+  const localHistory = useSelectionHistory<SelectedRegion | null>(null);
+  const selected = isControlled ? controlledSelected : localHistory.current;
 
   function setSelected(region: SelectedRegion | null) {
-    onSelect?.(region);
-    if (!isControlled) setLocalSelected(region);
+    if (isControlled) {
+      onSelect?.(region);
+    } else {
+      localHistory.push(region);
+    }
   }
 
   const selectedIl = selected?.il ?? null;
+
+  // Detay paneli, seçim değiştiğinde (tıklama veya Geri/İleri) otomatik açılıyor;
+  // ✕ ile kapatmak sadece paneli gizliyor, drill-down durumunu bozmuyor —
+  // kullanıcı panel kapalıyken de ilçeleri serbestçe tıklayabiliyor.
+  const [detailOpen, setDetailOpen] = useState(false);
+  useEffect(() => {
+    if (selected) setDetailOpen(true);
+  }, [selected]);
 
   const ilStats = useMemo(() => {
     const map = new Map<string, IlStat>();
@@ -83,37 +96,42 @@ export default function MapPanel({ regionStats, selected: controlledSelected, on
     setSelected({ il: selectedIl, ilce });
   }
 
-  function handleBack() {
-    setSelected(null);
-  }
-
   return (
-    <div className="relative">
-      {selectedIl ? (
-        <div>
-          <button type="button" onClick={handleBack} className="mb-2 text-body-sm text-primary">
-            ← Türkiye
-          </button>
-          <DistrictMap
-            ilSlug={normalizeRegionName(selectedIl)}
-            ilceStats={ilceStats}
-            onIlceClick={handleIlceClick}
-            selectedName={selected?.ilce ?? null}
-          />
-        </div>
-      ) : (
-        <TurkeyMap ilStats={ilStats} onIlClick={handleIlClick} selectedName={selected?.il ?? null} />
-      )}
-      <MapLegend />
-      {detail && (
-        <CityDetailPanel
-          name={detail.name}
-          kargoSayisi={detail.kargoSayisi}
-          slaIci={detail.slaIci}
-          slaDisi={detail.slaDisi}
-          onClose={() => setSelected(null)}
+    <div>
+      {!isControlled && (
+        <NavToolbar
+          onBack={localHistory.goBack}
+          onForward={localHistory.goForward}
+          canGoBack={localHistory.canGoBack}
+          canGoForward={localHistory.canGoForward}
         />
       )}
+      <div className="flex items-start">
+        <div className="relative min-w-0 flex-1 overflow-hidden">
+          {selectedIl ? (
+            <DistrictMap
+              ilSlug={normalizeRegionName(selectedIl)}
+              ilceStats={ilceStats}
+              onIlceClick={handleIlceClick}
+              selectedName={selected?.ilce ?? null}
+            />
+          ) : (
+            <TurkeyMap ilStats={ilStats} onIlClick={handleIlClick} selectedName={selected?.il ?? null} />
+          )}
+          <MapLegend />
+        </div>
+        {detail && detailOpen && (
+          <div className={isControlled ? "w-64 shrink-0" : "w-80 shrink-0"}>
+            <CityDetailPanel
+              name={detail.name}
+              kargoSayisi={detail.kargoSayisi}
+              slaIci={detail.slaIci}
+              slaDisi={detail.slaDisi}
+              onClose={() => setDetailOpen(false)}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 }

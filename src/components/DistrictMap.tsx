@@ -61,7 +61,7 @@ export default function DistrictMap({ ilSlug, ilceStats, onIlceClick, selectedNa
   return (
     <svg
       viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-      className="h-auto w-full"
+      className="h-auto w-full overflow-hidden"
       role="img"
       aria-label="İlçe haritası"
     >

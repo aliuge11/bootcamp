@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import MapPanel, { type SelectedRegion } from "./MapPanel";
+import NavToolbar from "./NavToolbar";
+import { useSelectionHistory } from "@/lib/useSelectionHistory";
 import type { RegionStat } from "@/types";
 
 export interface CompareMap {
@@ -10,18 +11,26 @@ export interface CompareMap {
 }
 
 export default function CompareView({ maps }: { maps: CompareMap[] }) {
-  const [selected, setSelected] = useState<SelectedRegion | null>(null);
+  const history = useSelectionHistory<SelectedRegion | null>(null);
 
   return (
-    <div className="grid h-full" style={{ gridTemplateColumns: `repeat(${maps.length}, 1fr)` }}>
-      {maps.map((map, index) => (
-        <div
-          key={map.id}
-          className={index < maps.length - 1 ? "border-r border-hairline" : undefined}
-        >
-          <MapPanel regionStats={map.regionStats} selected={selected} onSelect={setSelected} />
-        </div>
-      ))}
+    <div className="p-container-padding">
+      <NavToolbar
+        onBack={history.goBack}
+        onForward={history.goForward}
+        canGoBack={history.canGoBack}
+        canGoForward={history.canGoForward}
+      />
+      <div className="grid" style={{ gridTemplateColumns: `repeat(${maps.length}, 1fr)` }}>
+        {maps.map((map, index) => (
+          <div
+            key={map.id}
+            className={index < maps.length - 1 ? "border-r border-hairline" : undefined}
+          >
+            <MapPanel regionStats={map.regionStats} selected={history.current} onSelect={history.push} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
