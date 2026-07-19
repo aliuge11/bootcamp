@@ -51,9 +51,10 @@ Bu repo, PowerPoint sunumlarına gömülebilen etkileşimli bir Türkiye il/ilç
 
 ### Teknoloji yığını
 - **Next.js** (TypeScript, App Router) — web uygulaması ve API route'ları aynı projede.
-- **PostgreSQL** — kalıcı xlsx yüklemeleri, hesaplanmış il/ilçe metrikleri ve harita geçmişi için.
+- **PostgreSQL** (native kurulum, Docker değil) — kalıcı xlsx yüklemeleri, hesaplanmış il/ilçe metrikleri ve harita geçmişi için.
 - **SheetJS (`xlsx` paketi)** — .xlsx dosyalarını okumak için.
-- **react-simple-maps / d3-geo** — Türkiye il ve ilçe sınırlarını GeoJSON üzerinden render etmek için.
+- **d3-geo + topojson-client** — Türkiye il ve ilçe sınırlarını GeoJSON/topojson üzerinden ham SVG olarak render etmek için (`react-simple-maps` React 19 ile peer-dependency çakıştığı için kullanılmıyor).
+- **Tailwind CSS v4** (CSS-first `@theme`) — stil katmanı, tema DESIGN.md token'larından.
 
 ### INTENT.md'den gelen mimari kısıtlar
 - Site, iframe içine gömülmeye izin verecek şekilde yapılandırılmalı (`X-Frame-Options` / CSP `frame-ancestors`) — PowerPoint Web Viewer eklentisi bu olmadan çalışmıyor.
