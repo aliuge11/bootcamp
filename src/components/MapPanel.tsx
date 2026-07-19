@@ -8,20 +8,30 @@ import CityDetailPanel from "./CityDetailPanel";
 import { normalizeRegionName } from "@/lib/text";
 import type { RegionStat } from "@/types";
 
+export interface SelectedRegion {
+  il: string;
+  /** null ise il seviyesinde seçili, dolu ise o ilin bir ilçesi seçili. */
+  ilce: string | null;
+}
+
 interface MapPanelProps {
   regionStats: RegionStat[];
+  /** Verilirse MapPanel kontrollü çalışır (karşılaştırma görünümünde senkron seçim için). */
+  selected?: SelectedRegion | null;
+  onSelect?: (region: SelectedRegion | null) => void;
 }
 
-interface SelectedDetail {
-  name: string;
-  kargoSayisi: number;
-  slaIci: number;
-  slaDisi: number;
-}
+export default function MapPanel({ regionStats, selected: controlledSelected, onSelect }: MapPanelProps) {
+  const [localSelected, setLocalSelected] = useState<SelectedRegion | null>(null);
+  const isControlled = controlledSelected !== undefined;
+  const selected = isControlled ? controlledSelected : localSelected;
 
-export default function MapPanel({ regionStats }: MapPanelProps) {
-  const [selectedIl, setSelectedIl] = useState<string | null>(null);
-  const [selectedDetail, setSelectedDetail] = useState<SelectedDetail | null>(null);
+  function setSelected(region: SelectedRegion | null) {
+    onSelect?.(region);
+    if (!isControlled) setLocalSelected(region);
+  }
+
+  const selectedIl = selected?.il ?? null;
 
   const ilStats = useMemo(() => {
     const map = new Map<string, IlStat>();
@@ -45,51 +55,63 @@ export default function MapPanel({ regionStats }: MapPanelProps) {
     return map;
   }, [regionStats, selectedIl]);
 
-  function handleIlClick(il: string) {
-    setSelectedIl(il);
-    const stat = ilStats.get(il) ?? { kargoSayisi: 0, slaDisi: 0 };
+  const detail = useMemo(() => {
+    if (!selected) return null;
+    if (selected.ilce) {
+      const stat = ilceStats.get(selected.ilce);
+      const row = regionStats.find((r) => r.il === selected.il && r.ilce === selected.ilce);
+      return {
+        name: selected.ilce,
+        kargoSayisi: stat?.kargoSayisi ?? 0,
+        slaIci: row?.sla_ici ?? 0,
+        slaDisi: stat?.slaDisi ?? 0,
+      };
+    }
+    const stat = ilStats.get(selected.il) ?? { kargoSayisi: 0, slaDisi: 0 };
     const slaIci = regionStats
-      .filter((row) => row.il === il)
+      .filter((row) => row.il === selected.il)
       .reduce((sum, row) => sum + row.sla_ici, 0);
-    setSelectedDetail({ name: il, kargoSayisi: stat.kargoSayisi, slaIci, slaDisi: stat.slaDisi });
+    return { name: selected.il, kargoSayisi: stat.kargoSayisi, slaIci, slaDisi: stat.slaDisi };
+  }, [selected, ilStats, ilceStats, regionStats]);
+
+  function handleIlClick(il: string) {
+    setSelected({ il, ilce: null });
   }
 
   function handleIlceClick(ilce: string) {
-    const stat = ilceStats.get(ilce);
-    const row = regionStats.find((r) => r.il === selectedIl && r.ilce === ilce);
-    if (!stat || !row) return;
-    setSelectedDetail({ name: ilce, kargoSayisi: stat.kargoSayisi, slaIci: row.sla_ici, slaDisi: stat.slaDisi });
+    if (!selectedIl) return;
+    setSelected({ il: selectedIl, ilce });
   }
 
   function handleBack() {
-    setSelectedIl(null);
-    setSelectedDetail(null);
+    setSelected(null);
   }
 
   return (
     <div className="relative">
       {selectedIl ? (
         <div>
-          <button
-            type="button"
-            onClick={handleBack}
-            className="mb-2 text-body-sm text-primary"
-          >
+          <button type="button" onClick={handleBack} className="mb-2 text-body-sm text-primary">
             ← Türkiye
           </button>
-          <DistrictMap ilSlug={normalizeRegionName(selectedIl)} ilceStats={ilceStats} onIlceClick={handleIlceClick} />
+          <DistrictMap
+            ilSlug={normalizeRegionName(selectedIl)}
+            ilceStats={ilceStats}
+            onIlceClick={handleIlceClick}
+            selectedName={selected?.ilce ?? null}
+          />
         </div>
       ) : (
-        <TurkeyMap ilStats={ilStats} onIlClick={handleIlClick} />
+        <TurkeyMap ilStats={ilStats} onIlClick={handleIlClick} selectedName={selected?.il ?? null} />
       )}
       <MapLegend />
-      {selectedDetail && (
+      {detail && (
         <CityDetailPanel
-          name={selectedDetail.name}
-          kargoSayisi={selectedDetail.kargoSayisi}
-          slaIci={selectedDetail.slaIci}
-          slaDisi={selectedDetail.slaDisi}
-          onClose={() => setSelectedDetail(null)}
+          name={detail.name}
+          kargoSayisi={detail.kargoSayisi}
+          slaIci={detail.slaIci}
+          slaDisi={detail.slaDisi}
+          onClose={() => setSelected(null)}
         />
       )}
     </div>

@@ -24,9 +24,11 @@ interface DistrictMapProps {
   /** ilçe adı (title-case) -> o ilçenin toplam kargo/SLA dışı sayısı. */
   ilceStats?: Map<string, IlceStat>;
   onIlceClick?: (ilce: string) => void;
+  /** Senkron seçili ilçe adı — primary renkte kalın bir kontur ile vurgulanır. */
+  selectedName?: string | null;
 }
 
-export default function DistrictMap({ ilSlug, ilceStats, onIlceClick }: DistrictMapProps) {
+export default function DistrictMap({ ilSlug, ilceStats, onIlceClick, selectedName }: DistrictMapProps) {
   const [features, setFeatures] = useState<IlceFeature[] | null>(null);
 
   useEffect(() => {
@@ -86,6 +88,9 @@ export default function DistrictMap({ ilSlug, ilceStats, onIlceClick }: District
               strokeWidth={1}
               strokeOpacity={0.7}
             />
+            {selectedName === label && (
+              <path d={d} fill="none" stroke="var(--color-primary)" strokeWidth={2.5} />
+            )}
             <text
               x={centroid[0]}
               y={centroid[1]}

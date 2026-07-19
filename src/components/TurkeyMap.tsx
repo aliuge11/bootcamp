@@ -24,9 +24,11 @@ interface TurkeyMapProps {
   /** il adı -> o ilin toplam kargo/SLA dışı sayısı. Veri yoksa ilgili il gri (no-data) boyanır. */
   ilStats?: Map<string, IlStat>;
   onIlClick?: (il: string) => void;
+  /** Senkron seçili il adı — primary renkte kalın bir kontur ile vurgulanır. */
+  selectedName?: string | null;
 }
 
-export default function TurkeyMap({ ilStats, onIlClick }: TurkeyMapProps) {
+export default function TurkeyMap({ ilStats, onIlClick, selectedName }: TurkeyMapProps) {
   const [features, setFeatures] = useState<IlFeature[] | null>(null);
 
   useEffect(() => {
@@ -81,6 +83,9 @@ export default function TurkeyMap({ ilStats, onIlClick }: TurkeyMapProps) {
             className={onIlClick ? "cursor-pointer" : undefined}
           >
             <path d={d} fill={fill} stroke="var(--color-map-boundary)" strokeWidth={1.5} />
+            {selectedName === f.properties.name && (
+              <path d={d} fill="none" stroke="var(--color-primary)" strokeWidth={2.5} />
+            )}
             <text
               x={centroid[0]}
               y={centroid[1]}
