@@ -12,6 +12,8 @@
 
 # testing
 /coverage
+# geliştiricinin yerel iframe/gömme testi — belirli bir upload id'ye bağlı, kalıcı değil
+test/iframe-check.html
 
 # next.js
 /.next/
