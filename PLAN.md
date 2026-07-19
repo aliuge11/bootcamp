@@ -41,7 +41,7 @@ bootcamp/
 
 - **GeoJSON kaynağı:** [coskunomer/Turkish-Cities-Geojson-Dataset](https://github.com/coskunomer/Turkish-Cities-Geojson-Dataset) (MIT). `turkey.topojson` = 81 il sınırı, gerçek WGS84, `properties.name` düzgün Türkçe büyük harf (ör. "Kayseri"). `cities/{il-slug}.geojson` = 81 dosya, her biri o ilin ilçe sınırları, `properties.name` küçük harf (ör. "melikgazi"). İlçe dosyaları kendi yerel koordinat uzayında — bu yüzden ilçe haritası `d3.geoIdentity().fitSize()` ile render edilir, ülke haritasıyla aynı projeksiyon kullanılmaz.
 - **Harita render katmanı:** `react-simple-maps` **kullanılmıyor** — son sürümü React 19 ile peer-dependency çakışması veriyor (16-18 istiyor). Bunun yerine doğrudan `d3-geo` + `topojson-client` ile ham SVG `<path>`/`<text>` render ediliyor (CLAUDE.md zaten "react-simple-maps / d3-geo" diyerek d3-geo'yu bağımsız alternatif olarak belirtmişti).
-- **DB erişimi:** ham `pg` paketi, ORM yok. **Yerel DB:** Docker değil, native PostgreSQL 16 (winget ile) — bu makinede Docker kurulu değildi, kullanıcı native kurulumu tercih etti. `docker-compose.yml` yok.
+- **DB erişimi:** ham `pg` paketi, ORM yok. **Yerel DB:** Docker değil, native PostgreSQL — bu makinede Docker kurulu değildi, kullanıcı native kurulumu tercih etti. winget/EDB CDN engellendiği için PostgreSQL 17.10, Maven Central'daki `io.zonky.test.postgres` embedded-binaries paketinden kuruldu (bkz. MEMORY.md > Bilinen Gerçekler), `C:\Users\aliug\pgsql` + `pgsql-data`, `pg_ctl` ile manuel başlatma. `docker-compose.yml` yok.
 - **Stil katmanı:** Tailwind CSS v4 (CSS-first `@theme`, `tailwind.config.ts` yok) — `npm install tailwindcss` en güncel sürümü (v4) getirdi, plan yazılırken v3 varsayılmıştı. Token'lar `src/app/globals.css`'teki `@theme` bloğunda.
 - **Test:** Vitest, sadece saf mantık (`xlsxImport`, `slaColor`, `geo`) için.
 - **Kalıcı URL:** `uploads.id` (nanoid, 10 karakter, küçük harf+rakam). `uploads` ve `region_stats` satırları hiçbir zaman `UPDATE`/`DELETE` edilmez, sadece `INSERT`. Tek harita: `/map/[id]`. Karşılaştırma: `/map/compare?ids=id1,id2,id3,id4`.
@@ -76,7 +76,7 @@ bootcamp/
    ```
    Not: `X-Frame-Options` başlığı hiç eklenmiyor (Next.js varsayılan olarak da eklemiyor) — eklenirse iframe gömme kırılır. `frame-ancestors *` bilinçli bir karar: PowerPoint Web Viewer eklentisinin hangi origin'den yükleyeceği bilinmiyor, iç araç olduğu ve auth olmadığı için (CLAUDE.md) kısıtlamanın maliyeti yok.
 5. `.env.example` oluştur: `DATABASE_URL=postgresql://postgres:postgres@localhost:5432/mapapp`
-6. Yerel DB: Docker yok, bu makinede native PostgreSQL 16 (`winget install -e --id PostgreSQL.PostgreSQL.16`) kuruluyor. `docker-compose.yml` yazılmıyor.
+6. Yerel DB: Docker yok. `winget install -e --id PostgreSQL.PostgreSQL.16` EDB'nin CDN'inde 403 verirse (bu ortamda verdi), Maven Central'daki `io.zonky.test.postgres:embedded-postgres-binaries-windows-amd64` jar'ı indirilip içindeki `postgres-windows-x86_64.txz` bir kuruluma açılıyor (ör. `C:\Users\<kullanıcı>\pgsql`), `initdb` ile veri dizini oluşturuluyor, `pg_ctl start` ile başlatılıyor. `docker-compose.yml` yazılmıyor.
 7. `npm install pg nanoid xlsx react-simple-maps d3-geo topojson-client` + `npm install -D @types/pg @types/react-simple-maps @types/topojson-client vitest`.
 8. `src/app/layout.tsx`: kök layout, Inter fontu, `<html lang="tr">`, DESIGN.md'deki app-header bileşeninin (koyu lacivert bant) iskeleti.
 9. CLAUDE.md'nin "Teknoloji yığını" listesine şu satırı ekle: `- **Tailwind CSS** — DESIGN.md token'larından üretilen tema ile stil katmanı.`
@@ -136,7 +136,7 @@ bootcamp/
 4. `src/types/index.ts`: `UploadRecord`, `RegionStat`, `SlaBucket` tipleri.
 
 **Kabul Kriteri:**
-- Native PostgreSQL servisi çalışıyor (Windows service olarak).
+- Native PostgreSQL çalışıyor (`pg_ctl start` ile, Windows service olarak değil).
 - `npm run db:setup` hatasız tamamlanıyor.
 - Basit bir test insert + select (geçici bir script veya `psql -c` ile) iki tablonun da doğru şemayla var olduğunu doğruluyor.
 
