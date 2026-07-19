@@ -15,6 +15,7 @@ export interface UploadRecord {
   matched_rows: number;
   unmatched_rows: number;
   unmatched_details: UnmatchedRowDetail[] | null;
+  hidden: boolean;
 }
 
 export interface RegionStat {

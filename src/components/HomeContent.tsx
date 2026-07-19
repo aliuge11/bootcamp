@@ -13,7 +13,7 @@ export default function HomeContent({ uploads }: { uploads: UploadRecord[] }) {
       <div className="mb-section-margin">
         <UploadDropzone onUploaded={() => router.refresh()} />
       </div>
-      <UploadHistoryList uploads={uploads} />
+      <UploadHistoryList uploads={uploads} onDeleted={() => router.refresh()} />
     </div>
   );
 }

@@ -8,6 +8,13 @@ CREATE TABLE IF NOT EXISTS uploads (
   unmatched_details jsonb
 );
 
+-- Kullanıcı bir yüklemeyi "sildiğinde" satır kalıcı olarak silinmiyor, sadece
+-- geçmiş listesinden gizleniyor (hidden = true). /map/[id] linki her zaman
+-- çalışmaya devam ediyor — PowerPoint'e gömülü haritalar bozulmasın diye
+-- (bkz. INTENT.md "kalıcı URL"). ADD COLUMN IF NOT EXISTS ile var olan
+-- kurulumlarda da tekrar çalıştırılabilir (ayrı bir migration aracı yok).
+ALTER TABLE uploads ADD COLUMN IF NOT EXISTS hidden boolean NOT NULL DEFAULT false;
+
 CREATE TABLE IF NOT EXISTS region_stats (
   upload_id text NOT NULL REFERENCES uploads(id),
   il text NOT NULL,

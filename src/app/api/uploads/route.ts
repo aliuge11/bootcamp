@@ -5,7 +5,9 @@ import { query, withTransaction } from "@/lib/db";
 import type { UploadRecord } from "@/types";
 
 export async function GET() {
-  const uploads = await query<UploadRecord>("SELECT * FROM uploads ORDER BY uploaded_at DESC");
+  const uploads = await query<UploadRecord>(
+    "SELECT * FROM uploads WHERE hidden = false ORDER BY uploaded_at DESC",
+  );
   return NextResponse.json({ uploads });
 }
 

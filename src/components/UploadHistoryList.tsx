@@ -17,9 +17,16 @@ function formatDate(iso: string): string {
   });
 }
 
-export default function UploadHistoryList({ uploads }: { uploads: UploadRecord[] }) {
+export default function UploadHistoryList({
+  uploads,
+  onDeleted,
+}: {
+  uploads: UploadRecord[];
+  onDeleted?: () => void;
+}) {
   const [selected, setSelected] = useState<string[]>([]);
   const [limitWarning, setLimitWarning] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const router = useRouter();
 
   function toggle(id: string) {
@@ -40,6 +47,15 @@ export default function UploadHistoryList({ uploads }: { uploads: UploadRecord[]
   function handleCompare() {
     if (selected.length === 0) return;
     router.push(`/map/compare?ids=${selected.join(",")}`);
+  }
+
+  async function handleDelete(id: string, filename: string) {
+    if (!confirm(`"${filename}" geçmiş listesinden kaldırılsın mı?`)) return;
+    setDeletingId(id);
+    await fetch(`/api/uploads/${id}`, { method: "DELETE" });
+    setSelected((prev) => prev.filter((x) => x !== id));
+    setDeletingId(null);
+    onDeleted?.();
   }
 
   if (uploads.length === 0) {
@@ -67,6 +83,15 @@ export default function UploadHistoryList({ uploads }: { uploads: UploadRecord[]
             </Link>
             <span className="text-body-sm text-muted">{formatDate(upload.uploaded_at)}</span>
             <span className="text-body-sm text-muted">{upload.matched_rows} satır</span>
+            <button
+              type="button"
+              onClick={() => handleDelete(upload.id, upload.original_filename)}
+              disabled={deletingId === upload.id}
+              className="text-body-sm text-muted disabled:text-muted-soft"
+              aria-label={`${upload.original_filename} sil`}
+            >
+              Sil
+            </button>
           </li>
         ))}
       </ul>

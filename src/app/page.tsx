@@ -6,6 +6,8 @@ import type { UploadRecord } from "@/types";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const uploads = await query<UploadRecord>("SELECT * FROM uploads ORDER BY uploaded_at DESC");
+  const uploads = await query<UploadRecord>(
+    "SELECT * FROM uploads WHERE hidden = false ORDER BY uploaded_at DESC",
+  );
   return <HomeContent uploads={uploads} />;
 }
