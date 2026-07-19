@@ -2,26 +2,26 @@
 name: Etkileşimli Şehir Haritası
 description: BMW'nin kurumsal sitesinden ilham alan, veri yoğun bir lojistik/SLA kontrol paneli için tasarım sistemi. Harita renklendirmesi ödeal'in "SLA Dışı Kuralanlar" raporundaki 5 kategorili skalayı temel alıyor.
 colors:
-  primary: "#1C69D4"
-  primary-hover: "#0653B6"
-  primary-disabled: "#D6D6D6"
-  navy: "#101B33"
-  ink: "#1A1A1A"
-  body: "#3C3C3C"
-  muted: "#6B6B6B"
-  muted-soft: "#9A9A9A"
-  hairline: "#E6E6E6"
-  hairline-strong: "#CCCCCC"
-  surface: "#F7F6F3"
-  surface-card: "#FFFFFF"
+  primary: "#4C8EF0"
+  primary-hover: "#6BA3F5"
+  primary-disabled: "#3A3D45"
+  navy: "#0A0C10"
+  ink: "#F2F2F0"
+  body: "#C9C9C7"
+  muted: "#8B8D93"
+  muted-soft: "#5B5E66"
+  hairline: "#262A31"
+  hairline-strong: "#383D46"
+  surface: "#121417"
+  surface-card: "#1A1D22"
   sla-critical: "#E5342A"
-  sla-critical-soft: "#FBE4E2"
+  sla-critical-soft: "#3A1E1C"
   sla-high: "#F5A623"
-  sla-high-soft: "#FDF0DC"
+  sla-high-soft: "#3A2E18"
   sla-moderate: "#2CA0DB"
-  sla-moderate-soft: "#E4F3FA"
+  sla-moderate-soft: "#162A33"
   sla-clean: "#8BC34A"
-  sla-clean-soft: "#EEF6E4"
+  sla-clean-soft: "#1E2A16"
   sla-no-data: "#C4C4C4"
   map-boundary: "#FFFFFF"
 typography:
@@ -150,24 +150,33 @@ components:
     borderColor: "{colors.hairline}"
     textColor: "{colors.body}"
     typography: "{typography.body-sm}"
+  nav-button:
+    backgroundColor: "{colors.surface-card}"
+    borderColor: "{colors.hairline-strong}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.DEFAULT}"
+    height: 32px
+  nav-button-disabled:
+    textColor: "{colors.muted-soft}"
+    borderColor: "{colors.hairline}"
 ---
 
 ## Overview
 
 Referans: BMW'nin kurumsal sitesi — BMW M'in motorsport-gösterişli varyantından ayrı olarak, ölçülü ve oturaklı bir kurumsal-endüstriyel arayüz. Bu proje bir lojistik operasyon konsolu; "premium otomotiv konfigüratörü" sakinliğini, SLA verisiyle çalışan bir kontrol odasına taşıyor.
 
-Ekranın işi ikna etmek değil, okunmak. Kullanıcı (iç ekip) zaten neden burada olduğunu biliyor; arayüzün görevi 81 ilin performansını tek bakışta okunur kılmak, sonra bir ile tıklandığında o ilin ilçelerine sakin bir şekilde inmek. Kompozisyon kırık beyaz/krem tonlu bir zemin üzerinde oturuyor; koyu lacivert bant yalnızca üst başlıkta (app-header) kullanılıyor. Haritanın kendi renk dili ise mevcut bir kurumsal rapordan (ödeal'in "SLA Dışı Kuralanlar" il bazlı haritası) doğrudan devralınıyor — bu proje o statik PowerPoint haritasının etkileşimli/canlı karşılığı, aynı 5 renkli okuma dilini konuşuyor.
+Ekranın işi ikna etmek değil, okunmak. Kullanıcı (iç ekip) zaten neden burada olduğunu biliyor; arayüzün görevi 81 ilin performansını tek bakışta okunur kılmak, sonra bir ile tıklandığında o ilin ilçelerine sakin bir şekilde inmek. Kompozisyon koyu bir zemin üzerinde oturuyor (near-black, dokusuz) — bir kontrol odasının karanlık monitör duvarı gibi, harita üzerindeki 5 rengin ve stat kartlarının parlaklığı öne çıksın diye. Haritanın kendi renk dili mevcut bir kurumsal rapordan (ödeal'in "SLA Dışı Kuralanlar" il bazlı haritası) doğrudan devralınıyor — bu proje o statik PowerPoint haritasının etkileşimli/canlı karşılığı, aynı 5 renkli okuma dilini konuşuyor. Bu SLA renkleri tema koyu olsa da değişmiyor — referans rapordaki tanımları koruyor, sadece arayüz kromu (zemin, kart, yazı, kenarlık) koyu temaya uyarlanıyor.
 
 ## Colors
 
 İki ayrı renk katmanı var: arayüz kromu (BMW'den ilham alan nötr + tek mavi vurgu) ve harita verisi (ödeal raporundan devralınan 5 kategorili SLA skalası). Bu ikisi asla karışmıyor — mavi (primary) hiçbir zaman haritanın SLA verisini boyamak için kullanılmıyor, harita renkleri de hiçbir zaman arayüz kromunda (buton, header) kullanılmıyor.
 
-**Arayüz kromu:**
-- **Primary — {colors.primary} (BMW mavisi):** Tek etkileşim rengi. Sadece birincil buton, seçili filtre ve link için. Haritada sadece "senkron seçili şehir" konturunda kullanılıyor (bkz. Map & Veri Görselleştirme) — SLA verisini değil, kullanıcı etkileşimini temsil ediyor.
-- **Navy — {colors.navy}:** Sadece üst başlık (app-header) bandında.
-- **Ink / Body / Muted / Muted-soft:** Metin hiyerarşisi. Ink başlıklarda ve büyük metrik rakamlarında, body varsayılan gövde metninde, muted ikincil etiketlerde, muted-soft yer tutucu metinde.
-- **Hairline / Hairline-strong:** Kart kenarlıkları ve tablo ayırıcıları — haritanın kendi sınır çizgileriyle (map-boundary) karıştırılmıyor, ayrı bir token.
-- **Surface / Surface-card:** Sayfa zemini kırık beyaz, kartlar/paneller saf beyaz.
+**Arayüz kromu (koyu tema):**
+- **Primary — {colors.primary} (açık BMW mavisi):** Tek etkileşim rengi. Sadece birincil buton, seçili filtre ve link için. Haritada sadece "senkron seçili şehir" konturunda kullanılıyor (bkz. Map & Veri Görselleştirme) — SLA verisini değil, kullanıcı etkileşimini temsil ediyor. Koyu zeminde yeterli kontrast için ışık teması BMW mavisinden bir tık daha açık.
+- **Navy — {colors.navy}:** Sayfa zemininden bile daha koyu, near-black bir ton — sadece üst başlık (app-header) bandında, ince bir "kontrol şeridi" hissi vermek için.
+- **Ink / Body / Muted / Muted-soft:** Metin hiyerarşisi, açık tonlardan oluşuyor. Ink başlıklarda ve büyük metrik rakamlarında (kırık beyaza yakın, saf beyaz değil), body varsayılan gövde metninde, muted ikincil etiketlerde, muted-soft yer tutucu metinde.
+- **Hairline / Hairline-strong:** Kart kenarlıkları ve tablo ayırıcıları — koyu zeminde ince, düşük kontrastlı çizgiler. Haritanın kendi sınır çizgileriyle (map-boundary) karıştırılmıyor, ayrı bir token.
+- **Surface / Surface-card:** Sayfa zemini near-black, kartlar/paneller ondan bir tık açık koyu gri — derinlik farkı parlaklıkla kuruluyor (bkz. Elevation).
 
 **Harita / SLA skalası** — bir il veya ilçenin rengi, o bölgenin **SLA dışı oranına** (SLA dışı satır sayısı / toplam satır sayısı × 100) göre, referans rapordaki dört eşik ve gri "veri yok" durumuyla birebir aynı şekilde belirleniyor:
 
@@ -197,19 +206,20 @@ Tek aile: **Inter**. Yoğun sayısal veriyle çalışan bir kontrol panelinde ik
 ## Layout
 
 - **Izgara:** 8px temel birim.
-- **Kontrol şeridi:** Üstte sabit, {colors.navy} zeminli app-header.
+- **Kontrol şeridi:** Üstte sabit, {colors.navy} zeminli app-header — sadece proje adı, sayfaya özgü değil.
+- **Harita araç şeridi:** Harita/karşılaştırma sayfalarında, harita bölmesinin hemen üstünde, sayfaya özgü ince bir şerit — iki nav-button (Geri/İleri), bkz. Components > Navigasyon.
 - **Harita bölmesi:** Ekranın ana gövdesi. Tek harita yüklüyse tam genişlik; 2-4 harita yüklüyse eşit genişlikte dikey hairline ile ayrılmış sütunlara bölünüyor.
 - **Harita lejantı:** Her haritanın sağ alt köşesinde sabit, referans rapordaki gibi 5 satırlık küçük bir kutu (map-legend) — renk kutusu + aralık etiketi.
-- **Detay paneli:** Bir şehre tıklandığında haritanın sağından kayan sabit genişlikli bir panel (drawer).
+- **Detay paneli:** Bir şehre tıklandığında haritanın **yanında**, kendi sütununda açılan sabit genişlikli bir panel — harita alanının üzerine **bindirilmiyor**. Panel açıkken harita bölmesi genişliğini panel kadar kaybediyor (flex/grid ile), böylece panel hiçbir ilçeyi/ili görsel olarak kapatmıyor ve tıklanabilirliğini engellemiyor. Bu kural kesin: bir overlay/drawer'ın harita üzerine bindiği herhangi bir uygulama hatalıdır.
 - **Yoğunluk:** Container-padding (24px) ve card-gap (16px) dışında gereksiz negatif alan yok.
 
 ## Elevation & Depth
 
-Derinlik gölgeyle değil, hairline kenarlıkla kuruluyor.
+Derinlik gölgeyle değil, hairline kenarlıkla ve parlaklık farkıyla kuruluyor (koyu temada siyah gölge zaten görünmüyor).
 
-- **Seviye 1 (Zemin):** {colors.surface}, düz, dokusuz.
-- **Seviye 2 (Kart/panel):** {colors.surface-card} + 1px {colors.hairline} kenarlık. Gölge yok veya en fazla `0 1px 2px rgba(0,0,0,0.04)`.
-- **Seviye 3 (Detay paneli/drawer):** Seviye 2 ile aynı yüzey, ayrışmak için biraz daha belirgin bir sol kenarlık ({colors.hairline-strong}).
+- **Seviye 1 (Zemin):** {colors.surface} (near-black), düz, dokusuz.
+- **Seviye 2 (Kart/panel):** {colors.surface-card} (zeminden bir tık açık) + 1px {colors.hairline} kenarlık. Gölge kullanılmıyor — koyu zeminde gölge yerine parlaklık farkı derinlik veriyor.
+- **Seviye 3 (Detay paneli):** Seviye 2 ile aynı yüzey, ayrışmak için biraz daha belirgin bir sol kenarlık ({colors.hairline-strong}).
 - Cam efekti, glow, gradient yok.
 
 ## Shapes
@@ -235,6 +245,9 @@ Xlsx yükleme alanı sade bir kesikli-kenarlıklı (hairline-strong) dikdörtgen
 ### Map legend
 Referans rapordaki lejant kutusunun birebir karşılığı: 5 satır, her satırda küçük bir renk karesi + aralık metni ("%25+", "%24 - %10", "%9 - %0.01", "%0", "Gönderim Yok"). Her haritanın kendi lejantı var (4 harita yan yanaysa 4 lejant).
 
+### Navigasyon (Geri/İleri)
+İki nav-button, harita araç şeridinde: "◀ Geri" ve "İleri ▶". Haritadaki her seçim (bir ile/ilçeye tıklama, Türkiye'ye dönme) kendi içinde bir gezinti geçmişi oluşturuyor; bu iki buton o geçmişte ileri/geri gidiyor — tarayıcının kendi geçmişinden bağımsız, sayfaya özel bir yığın. Gidilecek geçmiş/gelecek yoksa buton nav-button-disabled durumunda (tıklanamaz, muted-soft metin). Bu butonlar PowerPoint'e gömülü iframe'de tarayıcı çerçevesi görünmediği için gerekli — kullanıcının gezinti için tek yolu bunlar.
+
 ## Map & Veri Görselleştirme
 
 - **Dolgu rengi:** Her il (ve drill-down'da her ilçe), Colors bölümündeki 5 kategorili SLA dışı oranı skalasına göre boyanıyor. Bu bir gradient/sürekli skala değil — referans rapordaki gibi kesin dört eşikli, kategorik bir boyama.
@@ -256,3 +269,5 @@ Referans rapordaki lejant kutusunun birebir karşılığı: 5 satır, her satır
 - **Don't** pill-shape (tam yuvarlak) buton veya rozet kullanma; {rounded.DEFAULT}/{rounded.sm} dışına çıkma.
 - **Don't** dört haritayı yan yana koyarken aralarına kart gölgesi/çerçevesi ekleme — tek bir ince hairline ayırıcı yeterli.
 - **Don't** aynı renkteki komşu il/ilçeleri sınır çizgisiz bırakma — bitişik iki kırmızı il, aralarında çizgi olmadan tek bir leke gibi görünür.
+- **Don't** detay panelini haritanın üzerine bindirme (absolute overlay) — panel kendi sütununda olmalı, hiçbir il/ilçeyi görsel olarak kapatıp tıklanmaz hale getirmemeli.
+- **Don't** ilçe etiketlerinin harita/SVG sınırlarının dışına taşmasına izin verme — SVG konteyneri kırpma (overflow: hidden) uygulamalı, uzun isimler görünürlüğü bozmamalı.
