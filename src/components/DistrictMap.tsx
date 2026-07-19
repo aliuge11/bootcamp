@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { geoIdentity, geoPath } from "d3-geo";
 import { toTitleCaseTr } from "@/lib/text";
+import { getSlaBucket, SLA_BUCKET_COLORS } from "@/lib/slaColor";
 
 const WIDTH = 960;
 const HEIGHT = 500;
@@ -13,7 +14,18 @@ interface IlceFeature {
   geometry: GeoJSON.Geometry;
 }
 
-export default function DistrictMap({ ilSlug }: { ilSlug: string }) {
+export interface IlceStat {
+  kargoSayisi: number;
+  slaDisi: number;
+}
+
+interface DistrictMapProps {
+  ilSlug: string;
+  /** ilçe adı (title-case) -> o ilçenin toplam kargo/SLA dışı sayısı. */
+  ilceStats?: Map<string, IlceStat>;
+}
+
+export default function DistrictMap({ ilSlug, ilceStats }: DistrictMapProps) {
   const [features, setFeatures] = useState<IlceFeature[] | null>(null);
 
   useEffect(() => {
@@ -54,11 +66,17 @@ export default function DistrictMap({ ilSlug }: { ilSlug: string }) {
         const d = path(f.geometry as GeoJSON.Geometry);
         const centroid = path.centroid(f.geometry as GeoJSON.Geometry);
         if (!d) return null;
+
+        const label = toTitleCaseTr(f.properties.name);
+        const stat = ilceStats?.get(label);
+        const bucket = getSlaBucket(stat?.kargoSayisi ?? 0, stat?.slaDisi ?? 0);
+        const fill = SLA_BUCKET_COLORS[bucket];
+
         return (
           <g key={f.properties.name}>
             <path
               d={d}
-              className="fill-surface-card"
+              fill={fill}
               stroke="var(--color-map-boundary)"
               strokeWidth={1}
               strokeOpacity={0.7}
@@ -70,7 +88,7 @@ export default function DistrictMap({ ilSlug }: { ilSlug: string }) {
               dominantBaseline="middle"
               className="text-map-label-district pointer-events-none select-none"
             >
-              {toTitleCaseTr(f.properties.name)}
+              {label}
             </text>
           </g>
         );

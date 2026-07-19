@@ -23,9 +23,10 @@ export interface IlStat {
 interface TurkeyMapProps {
   /** il adı -> o ilin toplam kargo/SLA dışı sayısı. Veri yoksa ilgili il gri (no-data) boyanır. */
   ilStats?: Map<string, IlStat>;
+  onIlClick?: (il: string) => void;
 }
 
-export default function TurkeyMap({ ilStats }: TurkeyMapProps) {
+export default function TurkeyMap({ ilStats, onIlClick }: TurkeyMapProps) {
   const [features, setFeatures] = useState<IlFeature[] | null>(null);
 
   useEffect(() => {
@@ -74,7 +75,11 @@ export default function TurkeyMap({ ilStats }: TurkeyMapProps) {
         const fill = SLA_BUCKET_COLORS[bucket];
 
         return (
-          <g key={f.properties.name}>
+          <g
+            key={f.properties.name}
+            onClick={onIlClick ? () => onIlClick(f.properties.name) : undefined}
+            className={onIlClick ? "cursor-pointer" : undefined}
+          >
             <path d={d} fill={fill} stroke="var(--color-map-boundary)" strokeWidth={1.5} />
             <text
               x={centroid[0]}
