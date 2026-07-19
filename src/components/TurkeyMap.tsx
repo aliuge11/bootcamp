@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { geoMercator, geoPath } from "d3-geo";
 import { feature } from "topojson-client";
 import type { Topology } from "topojson-specification";
+import { getSlaBucket, SLA_BUCKET_COLORS } from "@/lib/slaColor";
 
 const WIDTH = 960;
 const HEIGHT = 500;
@@ -14,7 +15,17 @@ interface IlFeature {
   geometry: GeoJSON.Geometry;
 }
 
-export default function TurkeyMap() {
+export interface IlStat {
+  kargoSayisi: number;
+  slaDisi: number;
+}
+
+interface TurkeyMapProps {
+  /** il adı -> o ilin toplam kargo/SLA dışı sayısı. Veri yoksa ilgili il gri (no-data) boyanır. */
+  ilStats?: Map<string, IlStat>;
+}
+
+export default function TurkeyMap({ ilStats }: TurkeyMapProps) {
   const [features, setFeatures] = useState<IlFeature[] | null>(null);
 
   useEffect(() => {
@@ -57,14 +68,14 @@ export default function TurkeyMap() {
         const d = path(f.geometry as GeoJSON.Geometry);
         const centroid = path.centroid(f.geometry as GeoJSON.Geometry);
         if (!d) return null;
+
+        const stat = ilStats?.get(f.properties.name);
+        const bucket = getSlaBucket(stat?.kargoSayisi ?? 0, stat?.slaDisi ?? 0);
+        const fill = SLA_BUCKET_COLORS[bucket];
+
         return (
           <g key={f.properties.name}>
-            <path
-              d={d}
-              className="fill-surface-card"
-              stroke="var(--color-map-boundary)"
-              strokeWidth={1.5}
-            />
+            <path d={d} fill={fill} stroke="var(--color-map-boundary)" strokeWidth={1.5} />
             <text
               x={centroid[0]}
               y={centroid[1]}
