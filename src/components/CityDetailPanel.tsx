@@ -40,16 +40,18 @@ export default function CityDetailPanel({
           ✕
         </button>
       </div>
-      {/* Başarı oranı tek hero kutu (asıl bakılacak sayı); kargo/SLA içi/dışı
+      {/* Başarı oranı tek hero kutu (asıl bakılacak sayı); kargo/SLA içi/SLA dışı
           küçük ve yan yana — dört büyük kutuyu alt alta dizmek paneli
           gereksiz uzatıp ekranın altındaki karşılaştırma özetini görünmez
-          kılıyordu. */}
+          kılıyordu. "SLA İçi"/"SLA Dışı" tam terimi korunuyor (kısaltma
+          yok); dar sütunda kırılmalarını önlemek için compact StatTile'ın
+          yatay padding'i daraltıldı, bkz. StatTile.tsx. */}
       <div className="flex flex-col gap-2">
         <StatTile value={formatPercent(basariOrani)} label="Başarı Oranı" />
         <div className="grid grid-cols-3 gap-2">
           <StatTile compact value={String(kargoSayisi)} label="Kargo" />
-          <StatTile compact value={String(slaIci)} label="İçi" />
-          <StatTile compact value={String(slaDisi)} label="Dışı" />
+          <StatTile compact value={String(slaIci)} label="SLA İçi" />
+          <StatTile compact value={String(slaDisi)} label="SLA Dışı" />
         </div>
       </div>
     </div>

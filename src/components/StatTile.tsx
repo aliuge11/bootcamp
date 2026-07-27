@@ -10,7 +10,7 @@ export default function StatTile({ value, label, compact = false }: StatTileProp
     <div
       className={
         compact
-          ? "rounded-md border border-hairline bg-surface-card p-2"
+          ? "rounded-md border border-hairline bg-surface-card px-1.5 py-2"
           : "rounded-md border border-hairline bg-surface-card p-panel-padding"
       }
     >
