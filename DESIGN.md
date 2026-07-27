@@ -248,6 +248,9 @@ Referans rapordaki lejant kutusunun birebir karşılığı: 5 satır, her satır
 ### Navigasyon (Geri/İleri)
 İki nav-button, harita araç şeridinde: "◀ Geri" ve "İleri ▶". Haritadaki her seçim (bir ile/ilçeye tıklama, Türkiye'ye dönme) kendi içinde bir gezinti geçmişi oluşturuyor; bu iki buton o geçmişte ileri/geri gidiyor — tarayıcının kendi geçmişinden bağımsız, sayfaya özel bir yığın. Gidilecek geçmiş/gelecek yoksa buton nav-button-disabled durumunda (tıklanamaz, muted-soft metin). Bu butonlar PowerPoint'e gömülü iframe'de tarayıcı çerçevesi görünmediği için gerekli — kullanıcının gezinti için tek yolu bunlar.
 
+### Karşılaştırma özeti
+Tam olarak iki harita karşılaştırılırken (elle seçim veya ana sayfadaki "İlk ve son yüklemeyi karşılaştır" kısayolu), ızgaranın altında stat-tile'a benzer tek bir kart. Başlık, o an haritalarda seçili olan kapsamı gösteriyor: hiçbir şey seçili değilse "Türkiye (toplam)", bir il seçiliyse il adı, bir ilçe seçiliyse "İl / İlçe". İçerik her zaman somut sayı: başarı oranı eski→yeni ok işaretiyle, puan farkı ve yön ("arttı"/"azaldı"/"değişmedi"), kargo sayısı eski→yeni. Bir haritada veri yoksa (kargo 0), yüzde/puan hesaplanmıyor — "veri yok, karşılaştırma yapılamıyor" gösteriliyor, sessizce %0 gibi yanıltıcı bir sayı üretilmiyor. Bu kart üç veya dört haritalı karşılaştırmada gösterilmiyor (karşılaştırma çifte anlamlı, ikiden fazla haritada "eski/yeni" belirsizleşir).
+
 ## Map & Veri Görselleştirme
 
 - **Dolgu rengi:** Her il (ve drill-down'da her ilçe), Colors bölümündeki 5 kategorili SLA dışı oranı skalasına göre boyanıyor. Bu bir gradient/sürekli skala değil — referans rapordaki gibi kesin dört eşikli, kategorik bir boyama.

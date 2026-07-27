@@ -25,6 +25,7 @@ Kullanıcının yüklediği .xlsx dosyalarından, il bazlı verileri gösteren e
 - 4'ten fazla xlsx yüklenmeye çalışıldığında sistem, aynı anda en fazla 4 harita karşılaştırılabileceğini belirten bir hata gösteriyor ve 5. dosyayı işlemiyor.
 - Kullanıcı, geçmişte yüklediği bir xlsx'ten oluşturulmuş haritaya sonradan tekrar erişebiliyor (yüklemeler kalıcı olarak saklanıyor, tek seferlik/geçici değil).
 - Bir haritanın URL'si oluşturulduktan sonra sabit kalıyor; bir PowerPoint dosyasına bir kez gömülen harita, sunum daha sonra tekrar açıldığında hâlâ çalışıyor.
+- İki harita karşılaştırılırken (özellikle ilk ve en son yükleme) sistem, kullanıcının kendisinin yorumlamasını beklemeden otomatik bir karşılaştırma cümlesi üretiyor: başarı oranındaki değişimi (eski → yeni, puan farkı, arttı/azaldı) ve kargo sayısındaki değişimi somut sayılarla gösteriyor. Bu özet, o an haritada seçili olan kapsama göre güncelleniyor — bir şehre tıklanınca şehir bazlı, bir ilçeye tıklanınca ilçe bazlı.
 
 ## Kapsam dışı
 - Birden fazla xlsx tek haritada birleştirilmiyor: her dosya kendi haritasını oluşturuyor, ekran haritalara bölünüyor (bkz. Hedef).
