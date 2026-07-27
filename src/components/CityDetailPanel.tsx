@@ -48,8 +48,8 @@ export default function CityDetailPanel({
         <StatTile value={formatPercent(basariOrani)} label="Başarı Oranı" />
         <div className="grid grid-cols-3 gap-2">
           <StatTile compact value={String(kargoSayisi)} label="Kargo" />
-          <StatTile compact value={String(slaIci)} label="SLA İçi" />
-          <StatTile compact value={String(slaDisi)} label="SLA Dışı" />
+          <StatTile compact value={String(slaIci)} label="İçi" />
+          <StatTile compact value={String(slaDisi)} label="Dışı" />
         </div>
       </div>
     </div>
