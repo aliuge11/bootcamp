@@ -231,7 +231,11 @@ Derinlik gölgeyle değil, hairline kenarlıkla ve parlaklık farkıyla kuruluyo
 ## Components
 
 ### Stat tile
-İl/ilçe detay panelindeki her metrik (kargo sayısı, SLA içi, SLA dışı, başarı oranı) bir stat-tile. Detay paneli her zaman dar (256-320px) olduğu için stat-tile'lar **tek sütunda alt alta** diziliyor, yan yana değil — 2 sütunlu bir ızgara denendiğinde "%45.45" gibi kesirli yüzdeler (kırılamayan tek parça metin) kutudan taşıyordu. Tek sütun, display-lg'nin (40px, kalın) her zaman kutu içinde kalmasını garanti ediyor. Ek güvenlik: `text-display-lg` (ve diğer tüm `text-*` rol class'ları) `overflow-wrap: anywhere` taşıyor — beklenmedik uzunlukta bir değer gelirse bile metin kutunun dışına taşmak yerine satır kırıyor.
+İl/ilçe detay panelinde iki kademe var, tek düz liste değil:
+- **Hero:** Başarı Oranı, tam panel genişliğinde tek stat-tile, display-lg (40px). Bu panelin "bakılacak" tek asıl sayısı.
+- **Compact:** Kargo Sayısı / SLA İçi / SLA Dışı, `grid-cols-3` ile yan yana, küçük tipografi (headline-sm, 18px) ve daha az padding (`compact` prop'u).
+
+Bu ikili kademe, dört büyük stat-tile'ı alt alta dizmenin (4× display-lg) paneli gereksiz uzatıp altındaki karşılaştırma özetini ekran dışına itmesi üzerine kuruldu — sadece tek bir sayı (başarı oranı) büyük vurguyu hak ediyor, geri kalan üçü destekleyici. 2 sütunlu düz bir ızgara da denenmişti; "%45.45" gibi kesirli yüzdeler (kırılamayan tek parça metin) o zaman kutudan taşıyordu — hero kutusu tam genişlik aldığı için bu risk kalmadı, compact kutular da kısa tam sayılar taşıdığı için dar sığıyor. Ek güvenlik: tüm `text-*` rol class'ları `overflow-wrap: anywhere` taşıyor — beklenmedik uzunlukta bir değer gelirse metin kutunun dışına taşmak yerine satır kırıyor.
 
 ### Badge (SLA dışı oranı)
 badge-sla, o bölgenin SLA dışı oranı bucket'ına göre 5 renkten birini alıyor (sla-critical/high/moderate/clean/no-data — bkz. Colors tablosu), arka planı `-soft` varyantı. Rozet metni her zaman bir sayı içeriyor (ör. "%32 SLA Dışı"), sadece renk asla tek başına anlam taşımıyor.
@@ -275,3 +279,4 @@ Tam olarak iki harita karşılaştırılırken (elle seçim veya ana sayfadaki "
 - **Don't** detay panelini veya lejantı haritanın üzerine bindirme (absolute overlay) — ikisi de kendi alanında (sütun/satır) olmalı, hiçbir il/ilçeyi görsel olarak kapatıp tıklanmaz hale getirmemeli. Türkiye'nin şeklinde her köşede gerçek iller var — "sağ alt köşeye sabitle" gibi bir konum kararı neredeyse her zaman bir ili kapatır.
 - **Don't** ilçe etiketlerinin harita/SVG sınırlarının dışına taşmasına izin verme — SVG konteyneri kırpma (overflow: hidden) uygulamalı, uzun isimler görünürlüğü bozmamalı.
 - **Don't** herhangi bir metnin (özellikle stat-tile değerleri gibi kırılamayan sayı/yüzde metinleri) kendi kutusundan taşmasına izin verme — kutu içeriğe göre genişlemiyor veya metin görünürlüğü bozacak şekilde kutuyu aşıyorsa, kutuyu büyüt (tek sütuna düşür, vb.), küçük bir kutuya sıkıştırmaya çalışma.
+- **Do** bir şehir/ilçe seçildiğinde ortaya çıkan her şeyi (harita, detay paneli, karşılaştırma özeti) tipik bir ekran yüksekliğinde (ör. 720px) kaydırma gerektirmeden göster. Bir bileşeni (ör. stat-tile'ları) taşmayı önlemek için büyütürken, bunun toplam sayfa yüksekliğini şişirip altındaki içeriği (karşılaştırma özeti gibi) ekran dışına itmediğini kontrol et — bir taşma sorununu çözerken başka bir kaydırma sorunu yaratmak kabul edilmez.
