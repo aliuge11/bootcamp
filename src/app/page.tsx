@@ -9,5 +9,7 @@ export default async function HomePage() {
   const uploads = await query<UploadRecord>(
     "SELECT * FROM uploads WHERE hidden = false ORDER BY uploaded_at DESC",
   );
-  return <HomeContent uploads={uploads} />;
+  const firstUploadId = uploads.length >= 2 ? uploads[uploads.length - 1].id : null;
+  const lastUploadId = uploads.length >= 2 ? uploads[0].id : null;
+  return <HomeContent uploads={uploads} firstUploadId={firstUploadId} lastUploadId={lastUploadId} />;
 }

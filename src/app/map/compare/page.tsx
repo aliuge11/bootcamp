@@ -26,11 +26,16 @@ export default async function ComparePage({
       "SELECT * FROM region_stats WHERE upload_id = $1 ORDER BY il, ilce",
       [id],
     );
-    maps.push({ id, regionStats });
+    maps.push({
+      id,
+      filename: uploads[0].original_filename,
+      uploadedAt: uploads[0].uploaded_at,
+      regionStats,
+    });
   }
 
   return (
-    <div className="flex h-[calc(100vh-56px)] flex-col">
+    <div className="min-h-[calc(100vh-56px)] p-0">
       {tooMany && (
         <p className="text-body-sm bg-sla-critical-soft p-3 text-sla-critical">
           En fazla 4 harita aynı anda gösterilebilir. 5. dosyayı yüklemeden önce birini kapat.
