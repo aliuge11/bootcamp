@@ -40,7 +40,7 @@ export default function CityDetailPanel({
           ✕
         </button>
       </div>
-      <div className="grid grid-cols-2 gap-card-gap">
+      <div className="flex flex-col gap-card-gap">
         <StatTile value={String(kargoSayisi)} label="Kargo Sayısı" />
         <StatTile value={String(slaIci)} label="SLA İçi" />
         <StatTile value={String(slaDisi)} label="SLA Dışı" />

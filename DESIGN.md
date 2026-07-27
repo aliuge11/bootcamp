@@ -209,7 +209,7 @@ Tek aile: **Inter**. Yoğun sayısal veriyle çalışan bir kontrol panelinde ik
 - **Kontrol şeridi:** Üstte sabit, {colors.navy} zeminli app-header — sadece proje adı, sayfaya özgü değil.
 - **Harita araç şeridi:** Harita/karşılaştırma sayfalarında, harita bölmesinin hemen üstünde, sayfaya özgü ince bir şerit — iki nav-button (Geri/İleri), bkz. Components > Navigasyon.
 - **Harita bölmesi:** Ekranın ana gövdesi. Tek harita tam genişlik; iki harita eşit genişlikte, dikey hairline ile ayrılmış tek sıra sütun. **3 harita 2 üstte + 1 altta, 4 harita 2x2** — ikisi de 2 sütunlu bir ızgara (hem dikey hem yatay hairline), sadece satır sayısı farklı. Üç veya dört haritayı tek sırada yan yana koymak her birini gereğinden dar bırakıyordu; 2 sütuna bölününce harita en-boy oranı (yatay) genişlikten daha çok kazanıyor.
-- **Harita lejantı:** Her haritanın sağ alt köşesinde sabit, referans rapordaki gibi 5 satırlık küçük bir kutu (map-legend) — renk kutusu + aralık etiketi.
+- **Harita lejantı:** Her haritanın altında, yatay bir şerit (map-legend) — renk kutusu + aralık etiketi, 5 öğe. Haritanın üzerine bindirilmiyor (bkz. Components > Map legend).
 - **Detay paneli:** Bir şehre tıklandığında haritanın **yanında**, kendi sütununda açılan sabit genişlikli bir panel — harita alanının üzerine **bindirilmiyor**. Panel açıkken harita bölmesi genişliğini panel kadar kaybediyor (flex/grid ile), böylece panel hiçbir ilçeyi/ili görsel olarak kapatmıyor ve tıklanabilirliğini engellemiyor. Bu kural kesin: bir overlay/drawer'ın harita üzerine bindiği herhangi bir uygulama hatalıdır. Tek harita görünümünde panel 320px, karşılaştırma görünümünde (2-4 harita, her birinin kendi paneli açılabildiği için yer daha kıymetli) 256px genişliğinde.
 - **Yoğunluk:** Container-padding (24px) ve card-gap (16px) dışında gereksiz negatif alan yok.
 
@@ -231,7 +231,7 @@ Derinlik gölgeyle değil, hairline kenarlıkla ve parlaklık farkıyla kuruluyo
 ## Components
 
 ### Stat tile
-İl/ilçe detay panelindeki her metrik (kargo sayısı, SLA içi, SLA dışı, başarı oranı) bir stat-tile. Bir panelde en fazla 4 stat-tile yan yana; sıkışınca 2x2'ye düşüyor.
+İl/ilçe detay panelindeki her metrik (kargo sayısı, SLA içi, SLA dışı, başarı oranı) bir stat-tile. Detay paneli her zaman dar (256-320px) olduğu için stat-tile'lar **tek sütunda alt alta** diziliyor, yan yana değil — 2 sütunlu bir ızgara denendiğinde "%45.45" gibi kesirli yüzdeler (kırılamayan tek parça metin) kutudan taşıyordu. Tek sütun, display-lg'nin (40px, kalın) her zaman kutu içinde kalmasını garanti ediyor. Ek güvenlik: `text-display-lg` (ve diğer tüm `text-*` rol class'ları) `overflow-wrap: anywhere` taşıyor — beklenmedik uzunlukta bir değer gelirse bile metin kutunun dışına taşmak yerine satır kırıyor.
 
 ### Badge (SLA dışı oranı)
 badge-sla, o bölgenin SLA dışı oranı bucket'ına göre 5 renkten birini alıyor (sla-critical/high/moderate/clean/no-data — bkz. Colors tablosu), arka planı `-soft` varyantı. Rozet metni her zaman bir sayı içeriyor (ör. "%32 SLA Dışı"), sadece renk asla tek başına anlam taşımıyor.
@@ -243,7 +243,7 @@ Birincil aksiyon button-primary; ikincil aksiyonlar button-ghost. Sayfada aynı 
 Xlsx yükleme alanı sade bir kesikli-kenarlıklı (hairline-strong) dikdörtgen. Yükleme her zaman açık — yüklemeler kalıcı ve sınırsız (bkz. INTENT.md). 4 harita sınırı yükleme anında değil, geçmiş listesinden karşılaştırma için seçim yaparken uygulanıyor: 5. dosya seçilmeye çalışılırsa "en fazla 4 harita" uyarısı gösteriliyor, seçim engelleniyor.
 
 ### Map legend
-Referans rapordaki lejant kutusunun birebir karşılığı: 5 satır, her satırda küçük bir renk karesi + aralık metni ("%25+", "%24 - %10", "%9 - %0.01", "%0", "Gönderim Yok"). Her haritanın kendi lejantı var (4 harita yan yanaysa 4 lejant).
+Referans rapordaki lejant kutusunun renk/etiket eşleşmesiyle aynı: 5 öğe (renk karesi + aralık metni: "%25+", "%24 - %10", "%9 - %0.01", "%0", "Gönderim Yok"). Konum referanstan farklı — **haritanın altında, kendi satırında, yatay bir şerit** olarak duruyor, haritanın üzerine bindirilmiyor. (İlk denemede haritanın sağ alt köşesine `absolute` bindirilmişti; Türkiye'nin şeklinde sağ alt köşe gerçek illere denk geldiği için lejant o illeri kapatıyor ve tıklanamaz kılıyordu — detay panelindeki aynı hatanın tekrarıydı, düzeltildi.) Her haritanın kendi lejantı var (4 harita yan yanaysa 4 lejant, her biri kendi haritasının altında).
 
 ### Navigasyon (Geri/İleri)
 İki nav-button, harita araç şeridinde: "◀ Geri" ve "İleri ▶". Haritadaki her seçim (bir ile/ilçeye tıklama, Türkiye'ye dönme) kendi içinde bir gezinti geçmişi oluşturuyor; bu iki buton o geçmişte ileri/geri gidiyor — tarayıcının kendi geçmişinden bağımsız, sayfaya özel bir yığın. Gidilecek geçmiş/gelecek yoksa buton nav-button-disabled durumunda (tıklanamaz, muted-soft metin). Bu butonlar PowerPoint'e gömülü iframe'de tarayıcı çerçevesi görünmediği için gerekli — kullanıcının gezinti için tek yolu bunlar.
@@ -272,5 +272,6 @@ Tam olarak iki harita karşılaştırılırken (elle seçim veya ana sayfadaki "
 - **Don't** pill-shape (tam yuvarlak) buton veya rozet kullanma; {rounded.DEFAULT}/{rounded.sm} dışına çıkma.
 - **Don't** dört haritayı yan yana koyarken aralarına kart gölgesi/çerçevesi ekleme — tek bir ince hairline ayırıcı yeterli.
 - **Don't** aynı renkteki komşu il/ilçeleri sınır çizgisiz bırakma — bitişik iki kırmızı il, aralarında çizgi olmadan tek bir leke gibi görünür.
-- **Don't** detay panelini haritanın üzerine bindirme (absolute overlay) — panel kendi sütununda olmalı, hiçbir il/ilçeyi görsel olarak kapatıp tıklanmaz hale getirmemeli.
+- **Don't** detay panelini veya lejantı haritanın üzerine bindirme (absolute overlay) — ikisi de kendi alanında (sütun/satır) olmalı, hiçbir il/ilçeyi görsel olarak kapatıp tıklanmaz hale getirmemeli. Türkiye'nin şeklinde her köşede gerçek iller var — "sağ alt köşeye sabitle" gibi bir konum kararı neredeyse her zaman bir ili kapatır.
 - **Don't** ilçe etiketlerinin harita/SVG sınırlarının dışına taşmasına izin verme — SVG konteyneri kırpma (overflow: hidden) uygulamalı, uzun isimler görünürlüğü bozmamalı.
+- **Don't** herhangi bir metnin (özellikle stat-tile değerleri gibi kırılamayan sayı/yüzde metinleri) kendi kutusundan taşmasına izin verme — kutu içeriğe göre genişlemiyor veya metin görünürlüğü bozacak şekilde kutuyu aşıyorsa, kutuyu büyüt (tek sütuna düşür, vb.), küçük bir kutuya sıkıştırmaya çalışma.
