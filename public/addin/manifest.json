@@ -53,7 +53,7 @@
         {
           "id": "SehirHaritasiContent",
           "code": {
-            "page": "https://dainty-pixie-bfd8bd.netlify.app/"
+            "page": "https://dainty-pixie-bfd8bd.netlify.app/addin/index.html"
           },
           "requestedWidth": 800,
           "requestedHeight": 500,
