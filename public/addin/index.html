@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Etkileşimli Şehir Haritası</title>
+    <!-- office.js: içerik eklentisinin PowerPoint'e "hazırım" sinyali vermesi
+         için gerekli. Bu olmadan slaytta "yükleniyor" ekranında takılabiliyor.
+         Uygulamanın kendisi office.js kullanmıyor (normal tarayıcı ziyaretçileri
+         için gereksiz olurdu) — sadece bu ince sarmalayıcı yüklüyor. -->
+    <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+    <style>
+      html, body { margin: 0; padding: 0; height: 100%; }
+      iframe { display: block; width: 100%; height: 100%; border: 0; }
+    </style>
+  </head>
+  <body>
+    <!-- Uygulamanın ana sayfasını gömüyor; kullanıcı gömülü yüzeyin içinde
+         herhangi bir haritaya gidebiliyor (aynı origin, iframe içi gezinme). -->
+    <iframe src="/" title="Etkileşimli Şehir Haritası"></iframe>
+    <script>
+      Office.onReady(function () {
+        // Eklenti hazır. iframe uygulamayı zaten yüklüyor.
+      });
+    </script>
+  </body>
+</html>

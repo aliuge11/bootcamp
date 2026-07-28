@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OfficeApp
+  xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
+  xsi:type="ContentApp">
+  <Id>e143bf08-62e3-48eb-bba4-66dcac2bfdb1</Id>
+  <Version>1.0.0.0</Version>
+  <ProviderName>Etkilesimli Sehir Haritasi</ProviderName>
+  <DefaultLocale>tr-TR</DefaultLocale>
+  <DisplayName DefaultValue="Etkilesimli Sehir Haritasi" />
+  <Description DefaultValue="Turkiye il/ilce SLA performans haritasini slayt icinde etkilesimli gosterir." />
+  <IconUrl DefaultValue="https://dainty-pixie-bfd8bd.netlify.app/addin/icon-32.png" />
+  <SupportUrl DefaultValue="https://dainty-pixie-bfd8bd.netlify.app/" />
+  <AppDomains>
+    <AppDomain>https://dainty-pixie-bfd8bd.netlify.app</AppDomain>
+  </AppDomains>
+  <Hosts>
+    <Host Name="Presentation" />
+  </Hosts>
+  <DefaultSettings>
+    <SourceLocation DefaultValue="https://dainty-pixie-bfd8bd.netlify.app/addin/index.html" />
+    <RequestedWidth>800</RequestedWidth>
+    <RequestedHeight>500</RequestedHeight>
+  </DefaultSettings>
+  <Permissions>ReadWriteDocument</Permissions>
+</OfficeApp>
