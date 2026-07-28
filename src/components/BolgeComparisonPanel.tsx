@@ -22,8 +22,9 @@ export default function BolgeComparisonPanel({ regionStats }: { regionStats: Reg
             <div className="min-w-0">
               <div className="text-body-md truncate text-ink">{row.bolge}</div>
               <div className="text-body-sm text-muted">
-                {row.kargoSayisi} kargo · {row.slaIci} SLA İçi · {row.slaDisi} SLA Dışı
+                {row.kargoSayisi} kargo · {row.slaIci} SLA İçi
               </div>
+              <div className="text-body-sm text-muted">{row.slaDisi} SLA Dışı</div>
             </div>
             <Badge bucket={getSlaBucket(row.kargoSayisi, row.slaDisi)}>
               {formatPercent(row.slaDisiOrani)}

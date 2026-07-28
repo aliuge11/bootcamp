@@ -12,7 +12,7 @@ const SOFT_BG: Record<SlaBucket, string> = {
 export default function Badge({ bucket, children }: { bucket: SlaBucket; children: string }) {
   return (
     <span
-      className="text-label-caps inline-block rounded-sm px-2 py-1"
+      className="text-label-caps inline-block shrink-0 whitespace-nowrap rounded-sm px-2 py-1"
       style={{ backgroundColor: SOFT_BG[bucket], color: SLA_BUCKET_COLORS[bucket] }}
     >
       {children}
