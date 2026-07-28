@@ -242,6 +242,9 @@ badge-sla, o bölgenin SLA dışı oranı bucket'ına göre 5 renkten birini al�
 ### Button
 Birincil aksiyon button-primary; ikincil aksiyonlar button-ghost. Sayfada aynı anda tek bir button-primary olmalı.
 
+### Harita hover tooltip'i
+Bir il veya ilçenin üzerine mouse ile gelince (tıklamadan), fare imlecini takip eden küçük bir kart açılıyor — bölge adı, başarı oranı ve kargo/SLA İçi/SLA Dışı sayıları (tıklayınca açılan CityDetailPanel'in aynı verisi, sadece küçük ve anlık). `position: fixed`, imleçten hafif ofsetli (14px sağ-alt), `pointer-events-none` (tooltip'in kendisi tıklama/hover'ı engellemiyor). Kart stili diğer kartlarla aynı (`border-hairline-strong`, `bg-surface-card`) — glow/gölge yok. Tıklama davranışına hiç dokunmuyor: mouse ile gezinirken hızlı bilgi, tıklayınca hâlâ tam detay paneli/drill-down.
+
 ### Upload dropzone
 Xlsx yükleme alanı sade bir kesikli-kenarlıklı (hairline-strong) dikdörtgen. Yükleme her zaman açık — yüklemeler kalıcı ve sınırsız (bkz. INTENT.md). 4 harita sınırı yükleme anında değil, geçmiş listesinden karşılaştırma için seçim yaparken uygulanıyor: 5. dosya seçilmeye çalışılırsa "en fazla 4 harita" uyarısı gösteriliyor, seçim engelleniyor. Dosya seçmeden önce opsiyonel bir "Harita adı" metin alanı var — boş bırakılırsa geçmiş listesinde ve harita başlığında dosya adı (`original_filename`) gösteriliyor, doldurulursa o isim (`display_name`) her yerde dosya adının yerini alıyor. Geçmiş listesindeki her satırda "Adlandır" aksiyonuyla isim sonradan da değiştirilebiliyor (yüklemeden sonra fikir değiştirmek için).
 

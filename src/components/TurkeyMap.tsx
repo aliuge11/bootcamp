@@ -6,6 +6,7 @@ import { feature, mesh } from "topojson-client";
 import type { Topology, GeometryObject } from "topojson-specification";
 import { getSlaBucket, SLA_BUCKET_COLORS } from "@/lib/slaColor";
 import { getBolge, type Bolge } from "@/lib/bolge";
+import MapTooltip from "./MapTooltip";
 
 const WIDTH = 960;
 const HEIGHT = 500;
@@ -18,6 +19,7 @@ interface IlFeature {
 
 export interface IlStat {
   kargoSayisi: number;
+  slaIci: number;
   slaDisi: number;
 }
 
@@ -38,6 +40,7 @@ interface TurkeyMapProps {
 
 export default function TurkeyMap({ ilStats, onIlClick, selectedName, labelMode = "il" }: TurkeyMapProps) {
   const [topology, setTopology] = useState<Topology | null>(null);
+  const [hovered, setHovered] = useState<{ name: string; x: number; y: number } | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -106,70 +109,87 @@ export default function TurkeyMap({ ilStats, onIlClick, selectedName, labelMode 
     bolgeBorderPath = path(bordersGeo as unknown as GeoJSON.Geometry);
   }
 
+  const hoveredStat = hovered ? ilStats?.get(hovered.name) : undefined;
+
   return (
-    <svg
-      viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-      className="h-auto w-full overflow-hidden"
-      role="img"
-      aria-label="Türkiye il haritası"
-    >
-      {features.map((f) => {
-        const d = path(f.geometry as GeoJSON.Geometry);
-        const centroid = path.centroid(f.geometry as GeoJSON.Geometry);
-        if (!d) return null;
+    <>
+      <svg
+        viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+        className="h-auto w-full overflow-hidden"
+        role="img"
+        aria-label="Türkiye il haritası"
+      >
+        {features.map((f) => {
+          const d = path(f.geometry as GeoJSON.Geometry);
+          const centroid = path.centroid(f.geometry as GeoJSON.Geometry);
+          if (!d) return null;
 
-        const stat = ilStats?.get(f.properties.name);
-        const bucket = getSlaBucket(stat?.kargoSayisi ?? 0, stat?.slaDisi ?? 0);
-        const fill = SLA_BUCKET_COLORS[bucket];
+          const stat = ilStats?.get(f.properties.name);
+          const bucket = getSlaBucket(stat?.kargoSayisi ?? 0, stat?.slaDisi ?? 0);
+          const fill = SLA_BUCKET_COLORS[bucket];
 
-        return (
-          <g
-            key={f.properties.name}
-            onClick={onIlClick ? () => onIlClick(f.properties.name) : undefined}
-            className={onIlClick ? "cursor-pointer" : undefined}
+          return (
+            <g
+              key={f.properties.name}
+              onClick={onIlClick ? () => onIlClick(f.properties.name) : undefined}
+              onMouseEnter={(e) => setHovered({ name: f.properties.name, x: e.clientX, y: e.clientY })}
+              onMouseMove={(e) => setHovered({ name: f.properties.name, x: e.clientX, y: e.clientY })}
+              onMouseLeave={() => setHovered(null)}
+              className={onIlClick ? "cursor-pointer" : undefined}
+            >
+              <path d={d} fill={fill} stroke="var(--color-map-boundary)" strokeWidth={1.5} />
+              {selectedName === f.properties.name && (
+                <path d={d} fill="none" stroke="var(--color-primary)" strokeWidth={2.5} />
+              )}
+              {labelMode === "il" && (
+                <text
+                  x={centroid[0]}
+                  y={centroid[1]}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  className="text-map-label pointer-events-none select-none"
+                >
+                  {f.properties.name}
+                </text>
+              )}
+            </g>
+          );
+        })}
+        {bolgeBorderPath && (
+          <path
+            d={bolgeBorderPath}
+            fill="none"
+            stroke="var(--color-map-boundary)"
+            strokeWidth={5}
+            strokeDasharray="9 5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="pointer-events-none"
+          />
+        )}
+        {bolgeLabelPositions.map(([bolge, [x, y]]) => (
+          <text
+            key={bolge}
+            x={x}
+            y={y}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            className="text-map-label pointer-events-none select-none"
           >
-            <path d={d} fill={fill} stroke="var(--color-map-boundary)" strokeWidth={1.5} />
-            {selectedName === f.properties.name && (
-              <path d={d} fill="none" stroke="var(--color-primary)" strokeWidth={2.5} />
-            )}
-            {labelMode === "il" && (
-              <text
-                x={centroid[0]}
-                y={centroid[1]}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                className="text-map-label pointer-events-none select-none"
-              >
-                {f.properties.name}
-              </text>
-            )}
-          </g>
-        );
-      })}
-      {bolgeBorderPath && (
-        <path
-          d={bolgeBorderPath}
-          fill="none"
-          stroke="var(--color-map-boundary)"
-          strokeWidth={5}
-          strokeDasharray="9 5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="pointer-events-none"
+            {bolge}
+          </text>
+        ))}
+      </svg>
+      {hovered && (
+        <MapTooltip
+          name={hovered.name}
+          kargoSayisi={hoveredStat?.kargoSayisi ?? 0}
+          slaIci={hoveredStat?.slaIci ?? 0}
+          slaDisi={hoveredStat?.slaDisi ?? 0}
+          x={hovered.x}
+          y={hovered.y}
         />
       )}
-      {bolgeLabelPositions.map(([bolge, [x, y]]) => (
-        <text
-          key={bolge}
-          x={x}
-          y={y}
-          textAnchor="middle"
-          dominantBaseline="middle"
-          className="text-map-label pointer-events-none select-none"
-        >
-          {bolge}
-        </text>
-      ))}
-    </svg>
+    </>
   );
 }

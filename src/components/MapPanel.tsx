@@ -71,8 +71,9 @@ export default function MapPanel({
   const ilStats = useMemo(() => {
     const map = new Map<string, IlStat>();
     for (const row of regionStats) {
-      const existing = map.get(row.il) ?? { kargoSayisi: 0, slaDisi: 0 };
+      const existing = map.get(row.il) ?? { kargoSayisi: 0, slaIci: 0, slaDisi: 0 };
       existing.kargoSayisi += row.kargo_sayisi;
+      existing.slaIci += row.sla_ici;
       existing.slaDisi += row.sla_disi;
       map.set(row.il, existing);
     }
@@ -84,7 +85,7 @@ export default function MapPanel({
     if (!selectedIl) return map;
     for (const row of regionStats) {
       if (row.il === selectedIl) {
-        map.set(row.ilce, { kargoSayisi: row.kargo_sayisi, slaDisi: row.sla_disi });
+        map.set(row.ilce, { kargoSayisi: row.kargo_sayisi, slaIci: row.sla_ici, slaDisi: row.sla_disi });
       }
     }
     return map;
@@ -93,21 +94,12 @@ export default function MapPanel({
   const detail = useMemo(() => {
     if (!selected) return null;
     if (selected.ilce) {
-      const stat = ilceStats.get(selected.ilce);
-      const row = regionStats.find((r) => r.il === selected.il && r.ilce === selected.ilce);
-      return {
-        name: selected.ilce,
-        kargoSayisi: stat?.kargoSayisi ?? 0,
-        slaIci: row?.sla_ici ?? 0,
-        slaDisi: stat?.slaDisi ?? 0,
-      };
+      const stat = ilceStats.get(selected.ilce) ?? { kargoSayisi: 0, slaIci: 0, slaDisi: 0 };
+      return { name: selected.ilce, ...stat };
     }
-    const stat = ilStats.get(selected.il) ?? { kargoSayisi: 0, slaDisi: 0 };
-    const slaIci = regionStats
-      .filter((row) => row.il === selected.il)
-      .reduce((sum, row) => sum + row.sla_ici, 0);
-    return { name: selected.il, kargoSayisi: stat.kargoSayisi, slaIci, slaDisi: stat.slaDisi };
-  }, [selected, ilStats, ilceStats, regionStats]);
+    const stat = ilStats.get(selected.il) ?? { kargoSayisi: 0, slaIci: 0, slaDisi: 0 };
+    return { name: selected.il, ...stat };
+  }, [selected, ilStats, ilceStats]);
 
   function handleIlClick(il: string) {
     setSelected({ il, ilce: null });

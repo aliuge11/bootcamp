@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { geoIdentity, geoPath } from "d3-geo";
 import { toTitleCaseTr } from "@/lib/text";
 import { getSlaBucket, SLA_BUCKET_COLORS } from "@/lib/slaColor";
+import MapTooltip from "./MapTooltip";
 
 const WIDTH = 960;
 const HEIGHT = 500;
@@ -16,6 +17,7 @@ interface IlceFeature {
 
 export interface IlceStat {
   kargoSayisi: number;
+  slaIci: number;
   slaDisi: number;
 }
 
@@ -30,6 +32,7 @@ interface DistrictMapProps {
 
 export default function DistrictMap({ ilSlug, ilceStats, onIlceClick, selectedName }: DistrictMapProps) {
   const [features, setFeatures] = useState<IlceFeature[] | null>(null);
+  const [hovered, setHovered] = useState<{ name: string; x: number; y: number } | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -58,51 +61,68 @@ export default function DistrictMap({ ilSlug, ilceStats, onIlceClick, selectedNa
     .fitSize([WIDTH, HEIGHT], { type: "FeatureCollection", features } as GeoJSON.FeatureCollection);
   const path = geoPath(projection);
 
+  const hoveredStat = hovered ? ilceStats?.get(hovered.name) : undefined;
+
   return (
-    <svg
-      viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-      className="h-auto w-full overflow-hidden"
-      role="img"
-      aria-label="İlçe haritası"
-    >
-      {features.map((f) => {
-        const d = path(f.geometry as GeoJSON.Geometry);
-        const centroid = path.centroid(f.geometry as GeoJSON.Geometry);
-        if (!d) return null;
+    <>
+      <svg
+        viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+        className="h-auto w-full overflow-hidden"
+        role="img"
+        aria-label="İlçe haritası"
+      >
+        {features.map((f) => {
+          const d = path(f.geometry as GeoJSON.Geometry);
+          const centroid = path.centroid(f.geometry as GeoJSON.Geometry);
+          if (!d) return null;
 
-        const label = toTitleCaseTr(f.properties.name);
-        const stat = ilceStats?.get(label);
-        const bucket = getSlaBucket(stat?.kargoSayisi ?? 0, stat?.slaDisi ?? 0);
-        const fill = SLA_BUCKET_COLORS[bucket];
+          const label = toTitleCaseTr(f.properties.name);
+          const stat = ilceStats?.get(label);
+          const bucket = getSlaBucket(stat?.kargoSayisi ?? 0, stat?.slaDisi ?? 0);
+          const fill = SLA_BUCKET_COLORS[bucket];
 
-        return (
-          <g
-            key={f.properties.name}
-            onClick={onIlceClick ? () => onIlceClick(label) : undefined}
-            className={onIlceClick ? "cursor-pointer" : undefined}
-          >
-            <path
-              d={d}
-              fill={fill}
-              stroke="var(--color-map-boundary)"
-              strokeWidth={1}
-              strokeOpacity={0.7}
-            />
-            {selectedName === label && (
-              <path d={d} fill="none" stroke="var(--color-primary)" strokeWidth={2.5} />
-            )}
-            <text
-              x={centroid[0]}
-              y={centroid[1]}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              className="text-map-label-district pointer-events-none select-none"
+          return (
+            <g
+              key={f.properties.name}
+              onClick={onIlceClick ? () => onIlceClick(label) : undefined}
+              onMouseEnter={(e) => setHovered({ name: label, x: e.clientX, y: e.clientY })}
+              onMouseMove={(e) => setHovered({ name: label, x: e.clientX, y: e.clientY })}
+              onMouseLeave={() => setHovered(null)}
+              className={onIlceClick ? "cursor-pointer" : undefined}
             >
-              {label}
-            </text>
-          </g>
-        );
-      })}
-    </svg>
+              <path
+                d={d}
+                fill={fill}
+                stroke="var(--color-map-boundary)"
+                strokeWidth={1}
+                strokeOpacity={0.7}
+              />
+              {selectedName === label && (
+                <path d={d} fill="none" stroke="var(--color-primary)" strokeWidth={2.5} />
+              )}
+              <text
+                x={centroid[0]}
+                y={centroid[1]}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                className="text-map-label-district pointer-events-none select-none"
+              >
+                {label}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
+      {hovered && (
+        <MapTooltip
+          name={hovered.name}
+          kargoSayisi={hoveredStat?.kargoSayisi ?? 0}
+          slaIci={hoveredStat?.slaIci ?? 0}
+          slaDisi={hoveredStat?.slaDisi ?? 0}
+          x={hovered.x}
+          y={hovered.y}
+        />
+      )}
+    </>
   );
 }
