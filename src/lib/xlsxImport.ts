@@ -3,6 +3,8 @@ import { resolveRegion } from "./geo";
 import { normalizeRegionName } from "./text";
 import type { UnmatchedRowDetail } from "@/types";
 
+const EXPECTED_HEADERS = ["Mali no", "İl", "İlçe", "SLA durum"];
+
 export interface RegionAggregate {
   il: string;
   ilce: string;
@@ -22,12 +24,29 @@ export interface ParsedKargoWorkbook {
 const SLA_ICI = "sla içi";
 const SLA_DISI = "sla dışı";
 
+// Veri satırları sütun pozisyonuna göre okunuyor (bkz. aşağıdaki row[1]/row[2]/row[3]),
+// başlık satırının içeriği aksi halde hiç kontrol edilmiyor. Sütun sırası beklenenden
+// farklıysa (ör. İl/İlçe yer değiştirmiş) veri sessizce yanlış eşleşir — bu yüzden
+// başlık satırı burada EXPECTED_HEADERS'a karşı doğrulanıyor, uymazsa içe aktarma
+// hata ile durduruluyor.
+function validateHeaderRow(headerRow: unknown[]): void {
+  for (let i = 0; i < EXPECTED_HEADERS.length; i++) {
+    const actual = String(headerRow[i] ?? "").trim();
+    if (normalizeRegionName(actual) !== normalizeRegionName(EXPECTED_HEADERS[i])) {
+      throw new Error(
+        `${i + 1}. sütun "${EXPECTED_HEADERS[i]}" olmalı, "${actual || "(boş)"}" bulundu. Sütun sırası: ${EXPECTED_HEADERS.join(" / ")}.`,
+      );
+    }
+  }
+}
+
 export function parseKargoWorkbook(buffer: Buffer): ParsedKargoWorkbook {
   const workbook = read(buffer, { type: "buffer" });
   const sheet = workbook.Sheets[workbook.SheetNames[0]];
-  // header: 1 -> satırları A/B/C/D sırasına göre dizi olarak okur, kolon adı önemsiz.
+  // header: 1 -> satırları A/B/C/D sırasına göre dizi olarak okur.
   const rows = utils.sheet_to_json<unknown[]>(sheet, { header: 1, blankrows: false });
 
+  validateHeaderRow(rows[0] ?? []);
   const dataRows = rows.slice(1); // ilk satır başlık, atlanıyor.
 
   const totals = new Map<string, RegionAggregate>();

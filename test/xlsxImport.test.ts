@@ -1,7 +1,15 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
+import { utils, write } from "xlsx";
 import { parseKargoWorkbook } from "@/lib/xlsxImport";
+
+function buildWorkbookBuffer(rows: unknown[][]): Buffer {
+  const sheet = utils.aoa_to_sheet(rows);
+  const workbook = utils.book_new();
+  utils.book_append_sheet(workbook, sheet, "Sheet1");
+  return write(workbook, { type: "buffer", bookType: "xlsx" });
+}
 
 function loadFixture() {
   const buffer = readFileSync(path.join(process.cwd(), "test/fixtures/sample-kargo.xlsx"));
@@ -49,5 +57,18 @@ describe("parseKargoWorkbook", () => {
   it("aynı ilin farklı ilçelerini ayrı satır olarak topluyor (Kayseri/Talas)", () => {
     const agg = findAggregate(loadFixture(), "Kayseri", "Talas");
     expect(agg).toEqual({ il: "Kayseri", ilce: "Talas", kargoSayisi: 10, slaIci: 6, slaDisi: 4 });
+  });
+
+  it("sütun sırası beklenenden farklıysa (İl/İlçe yer değiştirmiş) hata fırlatıyor", () => {
+    const buffer = buildWorkbookBuffer([
+      ["Mali no", "İlçe", "İl", "SLA durum"],
+      ["1", "Kadıköy", "İstanbul", "SLA İçi"],
+    ]);
+    expect(() => parseKargoWorkbook(buffer)).toThrow(/2\. sütun "İl" olmalı, "İlçe" bulundu/);
+  });
+
+  it("başlık satırı eksikse (dosya boşsa) hata fırlatıyor", () => {
+    const buffer = buildWorkbookBuffer([["Mali no", "İl"]]);
+    expect(() => parseKargoWorkbook(buffer)).toThrow(/3\. sütun "İlçe" olmalı, "\(boş\)" bulundu/);
   });
 });

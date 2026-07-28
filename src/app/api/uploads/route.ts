@@ -23,7 +23,13 @@ export async function POST(request: Request) {
   const displayName = typeof nameField === "string" && nameField.trim() ? nameField.trim() : null;
 
   const buffer = Buffer.from(await file.arrayBuffer());
-  const parsed = parseKargoWorkbook(buffer);
+  let parsed;
+  try {
+    parsed = parseKargoWorkbook(buffer);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Xlsx dosyası okunamadı.";
+    return NextResponse.json({ error: message }, { status: 400 });
+  }
   const id = generateUploadId();
 
   await withTransaction(async (query) => {

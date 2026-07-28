@@ -27,8 +27,9 @@ export default function UploadDropzone({ onUploaded }: { onUploaded?: () => void
     if (name.trim()) formData.append("name", name.trim());
     const response = await fetch("/api/uploads", { method: "POST", body: formData });
     if (!response.ok) {
+      const body = (await response.json().catch(() => null)) as { error?: string } | null;
       setStatus("error");
-      setError("Dosya işlenemedi. Xlsx formatını kontrol et.");
+      setError(body?.error ?? "Dosya işlenemedi. Xlsx formatını kontrol et.");
       return;
     }
     const data = (await response.json()) as UploadResult;
