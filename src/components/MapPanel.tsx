@@ -27,6 +27,7 @@ export default function MapPanel({ regionStats, selected: controlledSelected, on
   const isControlled = controlledSelected !== undefined;
   const localHistory = useSelectionHistory<SelectedRegion | null>(null);
   const selected = isControlled ? controlledSelected : localHistory.current;
+  const [labelMode, setLabelMode] = useState<"il" | "bolge">("il");
 
   function setSelected(region: SelectedRegion | null) {
     if (isControlled) {
@@ -106,6 +107,32 @@ export default function MapPanel({ regionStats, selected: controlledSelected, on
           canGoForward={localHistory.canGoForward}
         />
       )}
+      {!selectedIl && (
+        <div className="mb-2 flex gap-2">
+          <button
+            type="button"
+            onClick={() => setLabelMode("il")}
+            className={
+              labelMode === "il"
+                ? "text-body-sm h-8 rounded border border-primary bg-primary px-3 text-white"
+                : "text-body-sm h-8 rounded border border-hairline-strong bg-surface-card px-3 text-ink"
+            }
+          >
+            İl bazlı
+          </button>
+          <button
+            type="button"
+            onClick={() => setLabelMode("bolge")}
+            className={
+              labelMode === "bolge"
+                ? "text-body-sm h-8 rounded border border-primary bg-primary px-3 text-white"
+                : "text-body-sm h-8 rounded border border-hairline-strong bg-surface-card px-3 text-ink"
+            }
+          >
+            Bölge bazlı
+          </button>
+        </div>
+      )}
       <div className="flex items-start">
         <div className="relative min-w-0 flex-1 overflow-hidden">
           {selectedIl ? (
@@ -116,7 +143,12 @@ export default function MapPanel({ regionStats, selected: controlledSelected, on
               selectedName={selected?.ilce ?? null}
             />
           ) : (
-            <TurkeyMap ilStats={ilStats} onIlClick={handleIlClick} selectedName={selected?.il ?? null} />
+            <TurkeyMap
+              ilStats={ilStats}
+              onIlClick={handleIlClick}
+              selectedName={selected?.il ?? null}
+              labelMode={labelMode}
+            />
           )}
           <MapLegend />
         </div>

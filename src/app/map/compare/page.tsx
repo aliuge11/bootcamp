@@ -28,7 +28,7 @@ export default async function ComparePage({
     );
     maps.push({
       id,
-      filename: uploads[0].original_filename,
+      name: uploads[0].display_name ?? uploads[0].original_filename,
       uploadedAt: uploads[0].uploaded_at,
       regionStats,
     });

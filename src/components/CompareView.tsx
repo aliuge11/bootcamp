@@ -8,7 +8,7 @@ import type { RegionStat } from "@/types";
 
 export interface CompareMap {
   id: string;
-  filename: string;
+  name: string;
   uploadedAt: string;
   regionStats: RegionStat[];
 }
@@ -50,6 +50,7 @@ export default function CompareView({ maps }: { maps: CompareMap[] }) {
       <div className="grid" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
         {maps.map((map, index) => (
           <div key={map.id} className={borderClass(index, maps.length)}>
+            <h2 className="text-headline-sm mb-2 px-2 pt-2 text-ink">{map.name}</h2>
             <MapPanel regionStats={map.regionStats} selected={history.current} onSelect={history.push} />
           </div>
         ))}

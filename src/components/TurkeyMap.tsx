@@ -5,6 +5,7 @@ import { geoMercator, geoPath } from "d3-geo";
 import { feature } from "topojson-client";
 import type { Topology } from "topojson-specification";
 import { getSlaBucket, SLA_BUCKET_COLORS } from "@/lib/slaColor";
+import { getBolge, type Bolge } from "@/lib/bolge";
 
 const WIDTH = 960;
 const HEIGHT = 500;
@@ -26,9 +27,16 @@ interface TurkeyMapProps {
   onIlClick?: (il: string) => void;
   /** Senkron seçili il adı — primary renkte kalın bir kontur ile vurgulanır. */
   selectedName?: string | null;
+  /**
+   * "il" (varsayılan): her ilin adı kendi üzerine yazılır.
+   * "bolge": dolgu rengi ve il sınırları aynı kalır (SLA hâlâ il bazlı ölçülüyor),
+   * sadece etiketler 81 il adı yerine 7 coğrafi bölge adına dönüşür — illerin
+   * kendi verisi/rengi bozulmadan sadece daha üst düzey bir okuma sağlar.
+   */
+  labelMode?: "il" | "bolge";
 }
 
-export default function TurkeyMap({ ilStats, onIlClick, selectedName }: TurkeyMapProps) {
+export default function TurkeyMap({ ilStats, onIlClick, selectedName, labelMode = "il" }: TurkeyMapProps) {
   const [features, setFeatures] = useState<IlFeature[] | null>(null);
 
   useEffect(() => {
@@ -60,6 +68,27 @@ export default function TurkeyMap({ ilStats, onIlClick, selectedName }: TurkeyMa
   );
   const path = geoPath(projection);
 
+  // "Bölge bazlı" etiket konumu: gerçek bölge sınırı birleştirilmiyor (renk/il
+  // sınırları hep il bazlı kalıyor), sadece o bölgedeki illerin centroid'lerinin
+  // ortalaması alınıp bölge adı oraya yazılıyor.
+  let bolgeLabelPositions: [Bolge, [number, number]][] = [];
+  if (labelMode === "bolge") {
+    const groups = new Map<Bolge, [number, number][]>();
+    for (const f of features) {
+      const bolge = getBolge(f.properties.name);
+      if (!bolge) continue;
+      const centroid = path.centroid(f.geometry as GeoJSON.Geometry);
+      const list = groups.get(bolge) ?? [];
+      list.push(centroid);
+      groups.set(bolge, list);
+    }
+    bolgeLabelPositions = Array.from(groups.entries()).map(([bolge, points]) => {
+      const x = points.reduce((sum, p) => sum + p[0], 0) / points.length;
+      const y = points.reduce((sum, p) => sum + p[1], 0) / points.length;
+      return [bolge, [x, y]] as [Bolge, [number, number]];
+    });
+  }
+
   return (
     <svg
       viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
@@ -86,18 +115,32 @@ export default function TurkeyMap({ ilStats, onIlClick, selectedName }: TurkeyMa
             {selectedName === f.properties.name && (
               <path d={d} fill="none" stroke="var(--color-primary)" strokeWidth={2.5} />
             )}
-            <text
-              x={centroid[0]}
-              y={centroid[1]}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              className="text-map-label pointer-events-none select-none"
-            >
-              {f.properties.name}
-            </text>
+            {labelMode === "il" && (
+              <text
+                x={centroid[0]}
+                y={centroid[1]}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                className="text-map-label pointer-events-none select-none"
+              >
+                {f.properties.name}
+              </text>
+            )}
           </g>
         );
       })}
+      {bolgeLabelPositions.map(([bolge, [x, y]]) => (
+        <text
+          key={bolge}
+          x={x}
+          y={y}
+          textAnchor="middle"
+          dominantBaseline="middle"
+          className="text-map-label pointer-events-none select-none"
+        >
+          {bolge}
+        </text>
+      ))}
     </svg>
   );
 }
