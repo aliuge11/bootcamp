@@ -1,0 +1,65 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/teams/v1.27/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.27",
+  "version": "1.0.0",
+  "id": "e143bf08-62e3-48eb-bba4-66dcac2bfdb1",
+  "localizationInfo": {
+    "defaultLanguageTag": "tr-tr"
+  },
+  "developer": {
+    "name": "Etkilesimli Sehir Haritasi",
+    "websiteUrl": "https://dainty-pixie-bfd8bd.netlify.app/",
+    "privacyUrl": "https://dainty-pixie-bfd8bd.netlify.app/",
+    "termsOfUseUrl": "https://dainty-pixie-bfd8bd.netlify.app/"
+  },
+  "name": {
+    "short": "Sehir Haritasi",
+    "full": "Etkilesimli Sehir Haritasi"
+  },
+  "description": {
+    "short": "Turkiye il/ilce SLA haritasini slayt icinde etkilesimli gosterir.",
+    "full": "Yuklenen xlsx verisinden hesaplanan il/ilce SLA performansini gosteren etkilesimli Turkiye haritasini, PowerPoint slaydinin icinde canli ve tiklanabilir olarak gosterir."
+  },
+  "icons": {
+    "outline": "https://dainty-pixie-bfd8bd.netlify.app/addin/icon-32.png",
+    "color": "https://dainty-pixie-bfd8bd.netlify.app/addin/icon-64.png"
+  },
+  "accentColor": "#4C8EF0",
+  "validDomains": [
+    "dainty-pixie-bfd8bd.netlify.app"
+  ],
+  "authorization": {
+    "permissions": {
+      "resourceSpecific": [
+        {
+          "name": "Document.ReadWrite.User",
+          "type": "Delegated"
+        }
+      ]
+    }
+  },
+  "extensions": [
+    {
+      "requirements": {
+        "scopes": ["presentation"],
+        "capabilities": [
+          {
+            "name": "PowerPointApi",
+            "minVersion": "1.1"
+          }
+        ]
+      },
+      "contentRuntimes": [
+        {
+          "id": "SehirHaritasiContent",
+          "code": {
+            "page": "https://dainty-pixie-bfd8bd.netlify.app/"
+          },
+          "requestedWidth": 800,
+          "requestedHeight": 500,
+          "disableSnapshot": true
+        }
+      ]
+    }
+  ]
+}

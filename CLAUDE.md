@@ -58,6 +58,7 @@ Bu repo, PowerPoint sunumlarına gömülebilen etkileşimli bir Türkiye il/ilç
 
 ### INTENT.md'den gelen mimari kısıtlar
 - Site iframe içine gömülmeye izin vermeli — pratikte bu, `X-Frame-Options` ve CSP `frame-ancestors`'ın **hiç set edilmemesi** anlamına geliyor (ikisi de yoksa tarayıcı zaten kısıtlamıyor). `frame-ancestors *` gibi açıkça izin veren bir değer bile bazı Web Viewer eklentilerinin (ör. "Web Viewer 2.0") joker karakteri tanıyamayıp "kısıtlama var" sanıp gömmeyi reddetmesine yol açabiliyor — bkz. next.config.ts.
+- PowerPoint'e gömme için üçüncü parti "Web Viewer" eklentilerine (çoğu ücretli veya kaldırılmış) bağımlı kalmamak için `public/addin/manifest.json` altında kendi PowerPoint content add-in'imiz var — Microsoft'un resmi unified manifest formatını kullanıyor, ana sayfayı (`/`) gömüyor, kullanıcı gömülü yüzeyin içinde herhangi bir haritaya gidebiliyor. Sideload: PowerPoint → Ekle → Eklentiler → Kendi Eklentimi Yükle → bu manifest.json.
 - Her .xlsx yüklemesi kalıcı saklanıyor; oluşturulan harita URL'leri bir daha değişmiyor/silinmiyor (PowerPoint'e gömülü kalıyorlar).
 - Kargo sayısı ve başarı oranı, xlsx'teki ham satırlardan (Mali no, İl, İlçe, SLA durum) il/ilçe bazında hesaplanıyor: kargo sayısı = satır sayısı, başarı oranı = (SLA içi satır sayısı / toplam satır sayısı) × 100.
 - Harita varsayılan görünümde sadece il seviyesini gösteriyor; bir ile tıklanınca o ilin ilçeleri ve verileri açılıyor (drill-down).
