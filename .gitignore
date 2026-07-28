@@ -14,6 +14,8 @@
 /coverage
 # geliştiricinin yerel iframe/gömme testi — belirli bir upload id'ye bağlı, kalıcı değil
 test/iframe-check.html
+# kullanıcının manuel test için ürettiği xlsx dosyaları (scripts/generate-test-data.mjs)
+/test-data
 
 # next.js
 /.next/
