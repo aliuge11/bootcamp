@@ -151,7 +151,9 @@ export default function TurkeyMap({ ilStats, onIlClick, selectedName, labelMode 
           d={bolgeBorderPath}
           fill="none"
           stroke="var(--color-map-boundary)"
-          strokeWidth={3.5}
+          strokeWidth={5}
+          strokeDasharray="9 5"
+          strokeLinecap="round"
           strokeLinejoin="round"
           className="pointer-events-none"
         />
