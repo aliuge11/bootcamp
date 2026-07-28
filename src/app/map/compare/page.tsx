@@ -34,6 +34,11 @@ export default async function ComparePage({
     });
   }
 
+  // Izgarada her zaman kronolojik sırayla göster (en eski solda/üstte) —
+  // seçim sırası (ör. geçmiş listesinde tıklama sırası) hangi haritanın
+  // "ilk yüklenen" olduğuyla karışmasın diye.
+  maps.sort((a, b) => new Date(a.uploadedAt).getTime() - new Date(b.uploadedAt).getTime());
+
   return (
     <div className="min-h-[calc(100vh-56px)] p-0">
       {tooMany && (

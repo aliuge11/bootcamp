@@ -31,10 +31,6 @@ function borderClass(index: number, count: number): string | undefined {
   return classes.length > 0 ? `${classes.join(" ")} border-hairline` : undefined;
 }
 
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("tr-TR", { day: "2-digit", month: "2-digit", year: "numeric" });
-}
-
 export default function CompareView({ maps }: { maps: CompareMap[] }) {
   const history = useSelectionHistory<SelectedRegion | null>(null);
   const columns = gridColumns(maps.length);
@@ -55,19 +51,13 @@ export default function CompareView({ maps }: { maps: CompareMap[] }) {
           </div>
         ))}
       </div>
-      {maps.length === 2 &&
-        (() => {
-          const [earlier, later] = [...maps].sort(
-            (a, b) => new Date(a.uploadedAt).getTime() - new Date(b.uploadedAt).getTime(),
-          );
-          return (
-            <ComparisonSummary
-              earlier={{ label: formatDate(earlier.uploadedAt), regionStats: earlier.regionStats }}
-              later={{ label: formatDate(later.uploadedAt), regionStats: later.regionStats }}
-              selected={history.current}
-            />
-          );
-        })()}
+      {maps.length === 2 && (
+        <ComparisonSummary
+          earlier={{ label: maps[0].name, regionStats: maps[0].regionStats }}
+          later={{ label: maps[1].name, regionStats: maps[1].regionStats }}
+          selected={history.current}
+        />
+      )}
     </div>
   );
 }
