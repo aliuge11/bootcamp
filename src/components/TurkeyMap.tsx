@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { geoMercator, geoPath } from "d3-geo";
-import { feature } from "topojson-client";
-import type { Topology } from "topojson-specification";
+import { feature, mesh } from "topojson-client";
+import type { Topology, GeometryObject } from "topojson-specification";
 import { getSlaBucket, SLA_BUCKET_COLORS } from "@/lib/slaColor";
 import { getBolge, type Bolge } from "@/lib/bolge";
 
@@ -37,30 +37,30 @@ interface TurkeyMapProps {
 }
 
 export default function TurkeyMap({ ilStats, onIlClick, selectedName, labelMode = "il" }: TurkeyMapProps) {
-  const [features, setFeatures] = useState<IlFeature[] | null>(null);
+  const [topology, setTopology] = useState<Topology | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     fetch("/geo/turkey.topojson")
       .then((res) => res.json())
-      .then((topology: Topology) => {
-        if (cancelled) return;
-        const objectKey = Object.keys(topology.objects)[0];
-        const fc = feature(topology, topology.objects[objectKey]) as unknown as {
-          features: IlFeature[];
-        };
-        setFeatures(fc.features);
+      .then((topo: Topology) => {
+        if (!cancelled) setTopology(topo);
       });
     return () => {
       cancelled = true;
     };
   }, []);
 
-  if (!features) {
+  if (!topology) {
     return (
       <div className="text-body-md p-6 text-muted">Harita yükleniyor…</div>
     );
   }
+
+  const objectKey = Object.keys(topology.objects)[0];
+  const object = topology.objects[objectKey];
+  const fc = feature(topology, object) as unknown as { features: IlFeature[] };
+  const features = fc.features;
 
   const projection = geoMercator().fitSize(
     [WIDTH, HEIGHT],
@@ -87,6 +87,23 @@ export default function TurkeyMap({ ilStats, onIlClick, selectedName, labelMode 
       const y = points.reduce((sum, p) => sum + p[1], 0) / points.length;
       return [bolge, [x, y]] as [Bolge, [number, number]];
     });
+  }
+
+  // "Bölge bazlı"da il sınırları aynı kalıyor ama iki farklı bölgedeki komşu
+  // iller arasındaki sınır ayrıca kalın bir çizgiyle vurgulanıyor. topojson'un
+  // paylaşılan ark (arc) yapısı sayesinde poligon birleştirmeye gerek kalmadan,
+  // sadece "iki tarafındaki il farklı bölgedeyse" filtresiyle o kesişim
+  // çizgileri (mesh) tek bir path olarak çiziliyor.
+  let bolgeBorderPath: string | null = null;
+  if (labelMode === "bolge") {
+    const bordersGeo = mesh(topology, object as GeometryObject, (a, b) => {
+      if (!b) return false;
+      const nameA = (a as GeometryObject & { properties?: { name: string } }).properties?.name;
+      const nameB = (b as GeometryObject & { properties?: { name: string } }).properties?.name;
+      if (!nameA || !nameB) return false;
+      return getBolge(nameA) !== getBolge(nameB);
+    });
+    bolgeBorderPath = path(bordersGeo as unknown as GeoJSON.Geometry);
   }
 
   return (
@@ -129,6 +146,16 @@ export default function TurkeyMap({ ilStats, onIlClick, selectedName, labelMode 
           </g>
         );
       })}
+      {bolgeBorderPath && (
+        <path
+          d={bolgeBorderPath}
+          fill="none"
+          stroke="var(--color-map-boundary)"
+          strokeWidth={3.5}
+          strokeLinejoin="round"
+          className="pointer-events-none"
+        />
+      )}
       {bolgeLabelPositions.map(([bolge, [x, y]]) => (
         <text
           key={bolge}
