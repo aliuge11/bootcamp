@@ -57,7 +57,7 @@ Bu repo, PowerPoint sunumlarına gömülebilen etkileşimli bir Türkiye il/ilç
 - **Tailwind CSS v4** (CSS-first `@theme`) — stil katmanı, tema DESIGN.md token'larından.
 
 ### INTENT.md'den gelen mimari kısıtlar
-- Site, iframe içine gömülmeye izin verecek şekilde yapılandırılmalı (`X-Frame-Options` / CSP `frame-ancestors`) — PowerPoint Web Viewer eklentisi bu olmadan çalışmıyor.
+- Site iframe içine gömülmeye izin vermeli — pratikte bu, `X-Frame-Options` ve CSP `frame-ancestors`'ın **hiç set edilmemesi** anlamına geliyor (ikisi de yoksa tarayıcı zaten kısıtlamıyor). `frame-ancestors *` gibi açıkça izin veren bir değer bile bazı Web Viewer eklentilerinin (ör. "Web Viewer 2.0") joker karakteri tanıyamayıp "kısıtlama var" sanıp gömmeyi reddetmesine yol açabiliyor — bkz. next.config.ts.
 - Her .xlsx yüklemesi kalıcı saklanıyor; oluşturulan harita URL'leri bir daha değişmiyor/silinmiyor (PowerPoint'e gömülü kalıyorlar).
 - Kargo sayısı ve başarı oranı, xlsx'teki ham satırlardan (Mali no, İl, İlçe, SLA durum) il/ilçe bazında hesaplanıyor: kargo sayısı = satır sayısı, başarı oranı = (SLA içi satır sayısı / toplam satır sayısı) × 100.
 - Harita varsayılan görünümde sadece il seviyesini gösteriyor; bir ile tıklanınca o ilin ilçeleri ve verileri açılıyor (drill-down).
