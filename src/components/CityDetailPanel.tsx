@@ -1,6 +1,7 @@
 import StatTile from "./StatTile";
 import Badge from "./Badge";
 import { getSlaBucket } from "@/lib/slaColor";
+import { formatPercent } from "@/lib/format";
 
 interface CityDetailPanelProps {
   name: string;
@@ -8,12 +9,6 @@ interface CityDetailPanelProps {
   slaIci: number;
   slaDisi: number;
   onClose: () => void;
-}
-
-function formatPercent(value: number): string {
-  if (value === 0) return "%0";
-  const rounded = Math.round(value * 100) / 100;
-  return `%${rounded}`;
 }
 
 export default function CityDetailPanel({

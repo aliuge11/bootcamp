@@ -5,6 +5,7 @@ import TurkeyMap, { type IlStat } from "./TurkeyMap";
 import DistrictMap, { type IlceStat } from "./DistrictMap";
 import MapLegend from "./MapLegend";
 import CityDetailPanel from "./CityDetailPanel";
+import BolgeComparisonPanel from "./BolgeComparisonPanel";
 import NavToolbar from "./NavToolbar";
 import { useSelectionHistory } from "@/lib/useSelectionHistory";
 import { normalizeRegionName } from "@/lib/text";
@@ -161,6 +162,11 @@ export default function MapPanel({ regionStats, selected: controlledSelected, on
               slaDisi={detail.slaDisi}
               onClose={() => setDetailOpen(false)}
             />
+          </div>
+        )}
+        {!detail && labelMode === "bolge" && (
+          <div className={isControlled ? "w-64 shrink-0" : "w-80 shrink-0"}>
+            <BolgeComparisonPanel regionStats={regionStats} />
           </div>
         )}
       </div>
