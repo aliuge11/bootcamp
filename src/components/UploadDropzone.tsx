@@ -16,6 +16,7 @@ export default function UploadDropzone({ onUploaded }: { onUploaded?: () => void
   const [status, setStatus] = useState<"idle" | "uploading" | "done" | "error">("idle");
   const [result, setResult] = useState<UploadResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [name, setName] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   async function upload(file: File) {
@@ -23,6 +24,7 @@ export default function UploadDropzone({ onUploaded }: { onUploaded?: () => void
     setError(null);
     const formData = new FormData();
     formData.append("file", file);
+    if (name.trim()) formData.append("name", name.trim());
     const response = await fetch("/api/uploads", { method: "POST", body: formData });
     if (!response.ok) {
       setStatus("error");
@@ -52,6 +54,13 @@ export default function UploadDropzone({ onUploaded }: { onUploaded?: () => void
       {status === "idle" && (
         <>
           <p className="text-body-md text-muted">xlsx dosyasını sürükle veya seç</p>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Harita adı (opsiyonel)"
+            className="text-body-sm mt-3 h-9 w-full rounded border border-hairline-strong bg-surface px-3 text-ink placeholder:text-muted-soft"
+          />
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
@@ -112,6 +121,7 @@ export default function UploadDropzone({ onUploaded }: { onUploaded?: () => void
               onClick={() => {
                 setStatus("idle");
                 setResult(null);
+                setName("");
               }}
               className="text-body-sm text-muted"
             >

@@ -10,6 +10,7 @@ export interface UnmatchedRowDetail {
 export interface UploadRecord {
   id: string;
   original_filename: string;
+  display_name: string | null;
   uploaded_at: string;
   total_rows: number;
   matched_rows: number;

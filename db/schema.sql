@@ -15,6 +15,11 @@ CREATE TABLE IF NOT EXISTS uploads (
 -- kurulumlarda da tekrar çalıştırılabilir (ayrı bir migration aracı yok).
 ALTER TABLE uploads ADD COLUMN IF NOT EXISTS hidden boolean NOT NULL DEFAULT false;
 
+-- Kullanıcının yüklemeye verdiği kendi ismi (ör. "Ocak Sunumu"); boşsa
+-- original_filename gösterime düşüyor. Yükleme sırasında veya sonradan
+-- (geçmiş listesinden "Yeniden adlandır") set edilebiliyor.
+ALTER TABLE uploads ADD COLUMN IF NOT EXISTS display_name text;
+
 CREATE TABLE IF NOT EXISTS region_stats (
   upload_id text NOT NULL REFERENCES uploads(id),
   il text NOT NULL,

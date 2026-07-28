@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 interface NavToolbarProps {
   onBack: () => void;
   onForward: () => void;
@@ -24,6 +26,12 @@ export default function NavToolbar({ onBack, onForward, canGoBack, canGoForward 
       >
         İleri ▶
       </button>
+      <Link
+        href="/"
+        className="text-body-sm flex h-8 items-center rounded border border-hairline-strong bg-surface-card px-3 text-ink"
+      >
+        Ana Sayfa
+      </Link>
     </div>
   );
 }

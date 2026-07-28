@@ -19,10 +19,10 @@ function formatDate(iso: string): string {
 
 export default function UploadHistoryList({
   uploads,
-  onDeleted,
+  onChanged,
 }: {
   uploads: UploadRecord[];
-  onDeleted?: () => void;
+  onChanged?: () => void;
 }) {
   const [selected, setSelected] = useState<string[]>([]);
   const [limitWarning, setLimitWarning] = useState(false);
@@ -55,7 +55,18 @@ export default function UploadHistoryList({
     await fetch(`/api/uploads/${id}`, { method: "DELETE" });
     setSelected((prev) => prev.filter((x) => x !== id));
     setDeletingId(null);
-    onDeleted?.();
+    onChanged?.();
+  }
+
+  async function handleRename(id: string, currentName: string) {
+    const next = prompt("Harita adı:", currentName);
+    if (next === null) return;
+    await fetch(`/api/uploads/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ displayName: next }),
+    });
+    onChanged?.();
   }
 
   if (uploads.length === 0) {
@@ -70,33 +81,44 @@ export default function UploadHistoryList({
         </p>
       )}
       <ul className="divide-y divide-hairline">
-        {uploads.map((upload) => (
-          <li key={upload.id} className="flex items-center gap-3 py-2">
-            <input
-              type="checkbox"
-              checked={selected.includes(upload.id)}
-              onChange={() => toggle(upload.id)}
-              aria-label={`${upload.original_filename} karşılaştırmaya ekle`}
-              className="h-4 w-4 shrink-0 accent-primary"
-            />
-            <Link href={`/map/${upload.id}`} className="text-body-md min-w-0 flex-1 truncate text-ink">
-              {upload.original_filename}
-            </Link>
-            <span className="text-body-sm shrink-0 text-muted">{formatDate(upload.uploaded_at)}</span>
-            <span className="text-metric-md w-16 shrink-0 text-right text-muted">
-              {upload.matched_rows} satır
-            </span>
-            <button
-              type="button"
-              onClick={() => handleDelete(upload.id, upload.original_filename)}
-              disabled={deletingId === upload.id}
-              className="text-body-sm w-8 shrink-0 text-right text-muted-soft hover:text-muted disabled:text-muted-soft"
-              aria-label={`${upload.original_filename} sil`}
-            >
-              Sil
-            </button>
-          </li>
-        ))}
+        {uploads.map((upload) => {
+          const displayName = upload.display_name ?? upload.original_filename;
+          return (
+            <li key={upload.id} className="flex items-center gap-3 py-2">
+              <input
+                type="checkbox"
+                checked={selected.includes(upload.id)}
+                onChange={() => toggle(upload.id)}
+                aria-label={`${displayName} karşılaştırmaya ekle`}
+                className="h-4 w-4 shrink-0 accent-primary"
+              />
+              <Link href={`/map/${upload.id}`} className="text-body-md min-w-0 flex-1 truncate text-ink">
+                {displayName}
+              </Link>
+              <span className="text-body-sm shrink-0 text-muted">{formatDate(upload.uploaded_at)}</span>
+              <span className="text-metric-md w-16 shrink-0 text-right text-muted">
+                {upload.matched_rows} satır
+              </span>
+              <button
+                type="button"
+                onClick={() => handleRename(upload.id, displayName)}
+                className="text-body-sm shrink-0 text-muted-soft hover:text-muted"
+                aria-label={`${displayName} yeniden adlandır`}
+              >
+                Adlandır
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDelete(upload.id, displayName)}
+                disabled={deletingId === upload.id}
+                className="text-body-sm w-8 shrink-0 text-right text-muted-soft hover:text-muted disabled:text-muted-soft"
+                aria-label={`${displayName} sil`}
+              >
+                Sil
+              </button>
+            </li>
+          );
+        })}
       </ul>
       <button
         type="button"

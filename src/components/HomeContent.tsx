@@ -28,7 +28,7 @@ export default function HomeContent({ uploads, firstUploadId, lastUploadId }: Ho
           İlk ve son yüklemeyi karşılaştır →
         </Link>
       )}
-      <UploadHistoryList uploads={uploads} onDeleted={() => router.refresh()} />
+      <UploadHistoryList uploads={uploads} onChanged={() => router.refresh()} />
     </div>
   );
 }
