@@ -22,13 +22,33 @@ interface MapPanelProps {
   /** Verilirse MapPanel kontrollü çalışır (karşılaştırma görünümünde senkron seçim için); Geri/İleri de üst bileşen tarafından yönetilir. */
   selected?: SelectedRegion | null;
   onSelect?: (region: SelectedRegion | null) => void;
+  /** Verilirse İl/Bölge etiket modu da üst bileşen tarafından senkron yönetilir (karşılaştırmada bir haritada değiştirince hepsi değişsin diye). */
+  labelMode?: "il" | "bolge";
+  onLabelModeChange?: (mode: "il" | "bolge") => void;
 }
 
-export default function MapPanel({ regionStats, selected: controlledSelected, onSelect }: MapPanelProps) {
+export default function MapPanel({
+  regionStats,
+  selected: controlledSelected,
+  onSelect,
+  labelMode: controlledLabelMode,
+  onLabelModeChange,
+}: MapPanelProps) {
   const isControlled = controlledSelected !== undefined;
   const localHistory = useSelectionHistory<SelectedRegion | null>(null);
   const selected = isControlled ? controlledSelected : localHistory.current;
-  const [labelMode, setLabelMode] = useState<"il" | "bolge">("il");
+
+  const isLabelModeControlled = controlledLabelMode !== undefined;
+  const [localLabelMode, setLocalLabelMode] = useState<"il" | "bolge">("il");
+  const labelMode = isLabelModeControlled ? controlledLabelMode : localLabelMode;
+
+  function setLabelMode(mode: "il" | "bolge") {
+    if (isLabelModeControlled) {
+      onLabelModeChange?.(mode);
+    } else {
+      setLocalLabelMode(mode);
+    }
+  }
 
   function setSelected(region: SelectedRegion | null) {
     if (isControlled) {

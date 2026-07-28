@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import MapPanel, { type SelectedRegion } from "./MapPanel";
 import NavToolbar from "./NavToolbar";
 import ComparisonSummary from "./ComparisonSummary";
@@ -33,6 +34,9 @@ function borderClass(index: number, count: number): string | undefined {
 
 export default function CompareView({ maps }: { maps: CompareMap[] }) {
   const history = useSelectionHistory<SelectedRegion | null>(null);
+  // Bir haritada İl/Bölge bazlı değiştirilince hepsi senkron değişsin diye
+  // (seçim geçmişiyle aynı senkron desen), tek bir üst state paylaşılıyor.
+  const [labelMode, setLabelMode] = useState<"il" | "bolge">("il");
   const columns = gridColumns(maps.length);
 
   return (
@@ -47,7 +51,13 @@ export default function CompareView({ maps }: { maps: CompareMap[] }) {
         {maps.map((map, index) => (
           <div key={map.id} className={borderClass(index, maps.length)}>
             <h2 className="text-headline-sm mb-2 px-2 pt-2 text-ink">{map.name}</h2>
-            <MapPanel regionStats={map.regionStats} selected={history.current} onSelect={history.push} />
+            <MapPanel
+              regionStats={map.regionStats}
+              selected={history.current}
+              onSelect={history.push}
+              labelMode={labelMode}
+              onLabelModeChange={setLabelMode}
+            />
           </div>
         ))}
       </div>
