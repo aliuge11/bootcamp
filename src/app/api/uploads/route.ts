@@ -47,11 +47,31 @@ export async function POST(request: Request) {
       ],
     );
 
-    for (const agg of parsed.aggregates) {
+    // region_stats satırları tek tek değil, toplu (multi-row) INSERT ile
+    // yazılıyor: gerçek bir aylık dosya yüzlerce benzersiz il/ilçe üretebiliyor
+    // (ör. 491), her biri için ayrı INSERT yapmak Netlify fonksiyon süresini
+    // aşıp yüklemeyi "format hatası" gibi gösteren bir timeout'a yol açıyordu.
+    // Postgres'in ~65535 parametre sınırına takılmamak için parçalara bölünüyor.
+    const CHUNK = 500; // 500 satır × 6 sütun = 3000 parametre, sınırın çok altında
+    for (let start = 0; start < parsed.aggregates.length; start += CHUNK) {
+      const chunk = parsed.aggregates.slice(start, start + CHUNK);
+      const placeholders = chunk
+        .map((_, i) => {
+          const b = i * 6;
+          return `($${b + 1}, $${b + 2}, $${b + 3}, $${b + 4}, $${b + 5}, $${b + 6})`;
+        })
+        .join(", ");
+      const params = chunk.flatMap((agg) => [
+        id,
+        agg.il,
+        agg.ilce,
+        agg.kargoSayisi,
+        agg.slaIci,
+        agg.slaDisi,
+      ]);
       await query(
-        `INSERT INTO region_stats (upload_id, il, ilce, kargo_sayisi, sla_ici, sla_disi)
-         VALUES ($1, $2, $3, $4, $5, $6)`,
-        [id, agg.il, agg.ilce, agg.kargoSayisi, agg.slaIci, agg.slaDisi],
+        `INSERT INTO region_stats (upload_id, il, ilce, kargo_sayisi, sla_ici, sla_disi) VALUES ${placeholders}`,
+        params,
       );
     }
   });
