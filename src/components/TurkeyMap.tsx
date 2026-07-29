@@ -10,6 +10,10 @@ import MapTooltip from "./MapTooltip";
 
 const WIDTH = 960;
 const HEIGHT = 500;
+// Kenar illerin adları (ör. "Ardahan") SVG kenarına dayanıp kırpılmasın diye
+// harita kenarlardan biraz içeri alınıyor — etiketlere yer açılıyor.
+const MARGIN_X = 40;
+const MARGIN_Y = 24;
 
 interface IlFeature {
   type: "Feature";
@@ -65,8 +69,11 @@ export default function TurkeyMap({ ilStats, onIlClick, selectedName, labelMode 
   const fc = feature(topology, object) as unknown as { features: IlFeature[] };
   const features = fc.features;
 
-  const projection = geoMercator().fitSize(
-    [WIDTH, HEIGHT],
+  const projection = geoMercator().fitExtent(
+    [
+      [MARGIN_X, MARGIN_Y],
+      [WIDTH - MARGIN_X, HEIGHT - MARGIN_Y],
+    ],
     { type: "FeatureCollection", features } as GeoJSON.FeatureCollection,
   );
   const path = geoPath(projection);
@@ -109,6 +116,21 @@ export default function TurkeyMap({ ilStats, onIlClick, selectedName, labelMode 
     bolgeBorderPath = path(bordersGeo as unknown as GeoJSON.Geometry);
   }
 
+  // Şekiller ve etiketler iki ayrı geçişte çiziliyor (önce tüm dolgular, sonra
+  // etiketler): aksi halde sonradan çizilen komşu ilin dolgusu, önceki ilin
+  // etiketini örtüp "eksik/kaybolan" etiket sorununa yol açıyordu.
+  const cells = features
+    .map((f) => {
+      const d = path(f.geometry as GeoJSON.Geometry);
+      if (!d) return null;
+      const centroid = path.centroid(f.geometry as GeoJSON.Geometry);
+      const stat = ilStats?.get(f.properties.name);
+      const bucket = getSlaBucket(stat?.kargoSayisi ?? 0, stat?.slaDisi ?? 0);
+      return { name: f.properties.name, d, centroid, fill: SLA_BUCKET_COLORS[bucket] };
+    })
+    .filter((c): c is NonNullable<typeof c> => c !== null);
+
+  const selectedCell = selectedName ? cells.find((c) => c.name === selectedName) : null;
   const hoveredStat = hovered ? ilStats?.get(hovered.name) : undefined;
 
   return (
@@ -119,42 +141,31 @@ export default function TurkeyMap({ ilStats, onIlClick, selectedName, labelMode 
         role="img"
         aria-label="Türkiye il haritası"
       >
-        {features.map((f) => {
-          const d = path(f.geometry as GeoJSON.Geometry);
-          const centroid = path.centroid(f.geometry as GeoJSON.Geometry);
-          if (!d) return null;
-
-          const stat = ilStats?.get(f.properties.name);
-          const bucket = getSlaBucket(stat?.kargoSayisi ?? 0, stat?.slaDisi ?? 0);
-          const fill = SLA_BUCKET_COLORS[bucket];
-
-          return (
-            <g
-              key={f.properties.name}
-              onClick={onIlClick ? () => onIlClick(f.properties.name) : undefined}
-              onMouseEnter={(e) => setHovered({ name: f.properties.name, x: e.clientX, y: e.clientY })}
-              onMouseMove={(e) => setHovered({ name: f.properties.name, x: e.clientX, y: e.clientY })}
-              onMouseLeave={() => setHovered(null)}
-              className={onIlClick ? "cursor-pointer" : undefined}
-            >
-              <path d={d} fill={fill} stroke="var(--color-map-boundary)" strokeWidth={1.5} />
-              {selectedName === f.properties.name && (
-                <path d={d} fill="none" stroke="var(--color-primary)" strokeWidth={2.5} />
-              )}
-              {labelMode === "il" && (
-                <text
-                  x={centroid[0]}
-                  y={centroid[1]}
-                  textAnchor="middle"
-                  dominantBaseline="middle"
-                  className="text-map-label pointer-events-none select-none"
-                >
-                  {f.properties.name}
-                </text>
-              )}
-            </g>
-          );
-        })}
+        {/* 1. geçiş: dolgular + etkileşim */}
+        {cells.map((c) => (
+          <path
+            key={c.name}
+            d={c.d}
+            fill={c.fill}
+            stroke="var(--color-map-boundary)"
+            strokeWidth={1.5}
+            onClick={onIlClick ? () => onIlClick(c.name) : undefined}
+            onMouseEnter={(e) => setHovered({ name: c.name, x: e.clientX, y: e.clientY })}
+            onMouseMove={(e) => setHovered({ name: c.name, x: e.clientX, y: e.clientY })}
+            onMouseLeave={() => setHovered(null)}
+            className={onIlClick ? "cursor-pointer" : undefined}
+          />
+        ))}
+        {/* Seçili il konturu — tüm dolguların üstünde (komşu dolgu örtmesin). */}
+        {selectedCell && (
+          <path
+            d={selectedCell.d}
+            fill="none"
+            stroke="var(--color-primary)"
+            strokeWidth={2.5}
+            className="pointer-events-none"
+          />
+        )}
         {bolgeBorderPath && (
           <path
             d={bolgeBorderPath}
@@ -167,6 +178,20 @@ export default function TurkeyMap({ ilStats, onIlClick, selectedName, labelMode 
             className="pointer-events-none"
           />
         )}
+        {/* 2. geçiş: etiketler — her zaman en üstte. */}
+        {labelMode === "il" &&
+          cells.map((c) => (
+            <text
+              key={c.name}
+              x={c.centroid[0]}
+              y={c.centroid[1]}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              className="text-map-label pointer-events-none select-none"
+            >
+              {c.name}
+            </text>
+          ))}
         {bolgeLabelPositions.map(([bolge, [x, y]]) => (
           <text
             key={bolge}

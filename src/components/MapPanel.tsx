@@ -154,6 +154,7 @@ export default function MapPanel({
               ilceStats={ilceStats}
               onIlceClick={handleIlceClick}
               selectedName={selected?.ilce ?? null}
+              onBackgroundClick={() => setSelected(null)}
             />
           ) : (
             <TurkeyMap
